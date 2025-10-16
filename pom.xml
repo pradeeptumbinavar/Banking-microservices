@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.banking</groupId>
+    <artifactId>banking-microservices</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+    <name>Banking Microservices</name>
+    <description>Parent project for banking microservices architecture</description>
+
+    <!-- ========================================================= -->
+    <!--             COMMON PROPERTIES / VERSIONS                 -->
+    <!-- ========================================================= -->
+    <properties>
+        <!-- Java compiler level -->
+        <maven.compiler.release>21</maven.compiler.release>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <!-- Core versions -->
+        <spring-boot.version>3.2.7</spring-boot.version>
+        <spring-cloud.version>2023.0.3</spring-cloud.version>
+
+        <!-- Third-party versions -->
+        <springdoc.version>2.5.0</springdoc.version>
+        <jjwt.version>0.12.5</jjwt.version>
+        <totp.version>1.7.1</totp.version>
+        <lombok.version>1.18.34</lombok.version>
+    </properties>
+
+    <!-- ========================================================= -->
+    <!--                       MODULES                             -->
+    <!-- ========================================================= -->
+    <modules>
+        <module>infra/eureka-server</module>
+        <module>infra/api-gateway</module>
+        <module>services/auth-service</module>
+        <module>services/admin-service</module>
+        <module>services/customer-service</module>
+        <module>services/account-service</module>
+        <module>services/credit-service</module>
+        <module>services/payment-service</module>
+        <module>services/notification-service</module>
+    </modules>
+
+    <!-- ========================================================= -->
+    <!--              DEPENDENCY MANAGEMENT (BOMs)                 -->
+    <!-- ========================================================= -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- Spring Boot BOM -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Spring Cloud BOM -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Centralized third-party dependencies -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-api</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-impl</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt-jackson</artifactId>
+                <version>${jjwt.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>dev.samstevens.totp</groupId>
+                <artifactId>totp</artifactId>
+                <version>${totp.version}</version>
+            </dependency>
+
+            <!-- Lombok managed version -->
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- ========================================================= -->
+    <!--                       BUILD PLUGINS                        -->
+    <!-- ========================================================= -->
+    <build>
+        <pluginManagement>
+            <plugins>
+                <!-- Spring Boot -->
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
+                </plugin>
+
+                <!-- Java compiler setup (Java 21 + Lombok processor) -->
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.13.0</version>
+                    <configuration>
+                        <release>${maven.compiler.release}</release>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>${lombok.version}</version>
+                            </path>
+                        </annotationProcessorPaths>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+</project>

@@ -1,0 +1,30 @@
+# Default: let Git detect text files and normalize to LF in repo
+* text=auto
+
+# Unix shell scripts (must be LF)
+*.sh text eol=lf
+mvnw text eol=lf
+
+# Windows batch scripts (must be CRLF)
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Common text files (consistent LF is fine everywhere)
+*.java text eol=lf
+*.kt text eol=lf
+*.xml text eol=lf
+*.yml text eol=lf
+*.yaml text eol=lf
+*.properties text eol=lf
+*.md text eol=lf
+*.pem text eol=lf
+
+# Binary files (no EOL conversion)
+*.jar binary
+*.zip binary
+*.7z binary
+*.pdf binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary

@@ -1,0 +1,65 @@
+# Java / Maven
+target/
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+pom.xml.bak
+release.properties
+dependency-reduced-pom.xml
+
+# Build outputs
+*.class
+*.jar
+*.war
+*.ear
+
+# Test reports and logs
+*.log
+logs/
+surefire-reports/
+failsafe-reports/
+
+# IDE / Editor
+.idea/
+*.iml
+*.ipr
+*.iws
+.vscode/
+.project
+.classpath
+.settings/
+.factorypath
+bin/
+out/
+
+# OS files
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment / local configs
+.env
+.env.*
+*.local
+
+# Secrets (do not commit local dev keys)
+dev-keys/
+
+# JVM crash logs
+hs_err_pid*
+replay_pid*
+
+# Archives
+*.zip
+*.tar
+*.tar.gz
+*.7z
+
+# Temporary files
+*.tmp
+*.swp
+*.swo
+*~
+*.bak
+*.orig
+*.rej
