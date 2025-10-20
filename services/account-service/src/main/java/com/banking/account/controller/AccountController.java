@@ -29,13 +29,13 @@ public class AccountController {
     
     @GetMapping("/{id}")
     @Operation(summary = "Get account by ID")
-    public ResponseEntity<AccountResponse> getAccount(@PathVariable Long id) {
+    public ResponseEntity<AccountResponse> getAccount(@PathVariable("id") Long id) {
         return ResponseEntity.ok(accountService.getAccount(id));
     }
     
     @GetMapping("/{id}/balance")
     @Operation(summary = "Get account balance")
-    public ResponseEntity<BalanceResponse> getBalance(@PathVariable Long id) {
+    public ResponseEntity<BalanceResponse> getBalance(@PathVariable("id") Long id) {
         return ResponseEntity.ok(accountService.getBalance(id));
     }
     

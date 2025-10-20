@@ -6,33 +6,69 @@ import com.banking.admin.service.AdminService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/admin")
-@RequiredArgsConstructor
 @Tag(name = "Admin", description = "Admin aggregation and approval APIs")
 @SecurityRequirement(name = "bearerAuth")
 public class AdminController {
     
     private final AdminService adminService;
     
-    @GetMapping("/approvals/pending")
-    @Operation(summary = "Get all pending approvals from all services")
-    public ResponseEntity<List<ApprovalResponse>> getPendingApprovals() {
-        return ResponseEntity.ok(adminService.getPendingApprovals());
+    public AdminController(AdminService adminService) {
+        this.adminService = adminService;
     }
     
-    @PostMapping("/approvals/execute")
-    @Operation(summary = "Execute bulk approvals across services")
-    public ResponseEntity<Map<String, String>> executeApprovals(
-            @RequestBody Map<String, ApprovalRequest> approvalsByService) {
-        return ResponseEntity.ok(adminService.executeApprovals(approvalsByService));
+    @GetMapping("/customers/approvals")
+    @Operation(summary = "Get pending customer KYC approvals")
+    public ResponseEntity<List<ApprovalResponse>> getCustomerPendingApprovals() {
+        return ResponseEntity.ok(adminService.getCustomerPendingApprovals());
+    }
+
+    @PostMapping("/customers/approvals/bulk")
+    @Operation(summary = "Bulk approve/reject customer KYC")
+    public ResponseEntity<String> bulkApproveCustomers(@RequestBody ApprovalRequest request) {
+        return ResponseEntity.ok(adminService.bulkApproveCustomers(request));
+    }
+
+    @GetMapping("/accounts/approvals")
+    @Operation(summary = "Get pending account approvals")
+    public ResponseEntity<List<ApprovalResponse>> getAccountPendingApprovals() {
+        return ResponseEntity.ok(adminService.getAccountPendingApprovals());
+    }
+
+    @PostMapping("/accounts/approvals/bulk")
+    @Operation(summary = "Bulk approve/reject accounts")
+    public ResponseEntity<String> bulkApproveAccounts(@RequestBody ApprovalRequest request) {
+        return ResponseEntity.ok(adminService.bulkApproveAccounts(request));
+    }
+
+    @GetMapping("/credits/approvals")
+    @Operation(summary = "Get pending credit approvals")
+    public ResponseEntity<List<ApprovalResponse>> getCreditPendingApprovals() {
+        return ResponseEntity.ok(adminService.getCreditPendingApprovals());
+    }
+
+    @PostMapping("/credits/approvals/bulk")
+    @Operation(summary = "Bulk approve/reject credit products")
+    public ResponseEntity<String> bulkApproveCredits(@RequestBody ApprovalRequest request) {
+        return ResponseEntity.ok(adminService.bulkApproveCredits(request));
+    }
+
+    @GetMapping("/payments/approvals")
+    @Operation(summary = "Get pending payment approvals")
+    public ResponseEntity<List<ApprovalResponse>> getPaymentPendingApprovals() {
+        return ResponseEntity.ok(adminService.getPaymentPendingApprovals());
+    }
+
+    @PostMapping("/payments/approvals/bulk")
+    @Operation(summary = "Bulk approve/reject payments")
+    public ResponseEntity<String> bulkApprovePayments(@RequestBody ApprovalRequest request) {
+        return ResponseEntity.ok(adminService.bulkApprovePayments(request));
     }
 }
 

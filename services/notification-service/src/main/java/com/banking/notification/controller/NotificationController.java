@@ -28,7 +28,7 @@ public class NotificationController {
     
     @GetMapping("/{id}")
     @Operation(summary = "Get notification by ID")
-    public ResponseEntity<NotificationResponse> getNotification(@PathVariable Long id) {
+    public ResponseEntity<NotificationResponse> getNotification(@PathVariable("id") Long id) {
         return ResponseEntity.ok(notificationService.getNotification(id));
     }
 }

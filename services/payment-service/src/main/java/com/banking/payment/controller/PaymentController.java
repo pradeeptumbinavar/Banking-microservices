@@ -29,7 +29,7 @@ public class PaymentController {
     
     @GetMapping("/{id}")
     @Operation(summary = "Get payment by ID")
-    public ResponseEntity<PaymentResponse> getPayment(@PathVariable Long id) {
+    public ResponseEntity<PaymentResponse> getPayment(@PathVariable("id") Long id) {
         return ResponseEntity.ok(paymentService.getPayment(id));
     }
     

@@ -9,13 +9,17 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import java.util.List;
 
-@FeignClient(name = "payment-service")
+@FeignClient(
+    name = "payment-service",
+    path = "/payments",
+    configuration = com.banking.admin.config.FeignConfig.class
+)
 public interface PaymentServiceClient {
     
-    @GetMapping("/payments/approvals")
+    @GetMapping("/approvals")
     List<ApprovalResponse> getPendingApprovals();
     
-    @PostMapping("/payments/approvals/bulk")
+    @PostMapping("/approvals/bulk")
     String bulkApprove(@RequestBody ApprovalRequest request);
 }
 

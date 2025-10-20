@@ -37,14 +37,14 @@ public class CustomerController {
 
     @GetMapping("/{id}")
     @Operation(summary = "Get customer by ID")
-    public ResponseEntity<CustomerResponse> getCustomer(@PathVariable Long id) {
+    public ResponseEntity<CustomerResponse> getCustomer(@PathVariable("id") Long id) {
         return ResponseEntity.ok(customerService.getCustomer(id));
     }
     
     @PutMapping("/{id}")
     @Operation(summary = "Update customer profile")
     public ResponseEntity<CustomerResponse> updateCustomer(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @Valid @RequestBody CustomerRequest request) {
         return ResponseEntity.ok(customerService.updateCustomer(id, request));
     }
@@ -52,7 +52,7 @@ public class CustomerController {
     @PostMapping("/{id}/kyc")
     @Operation(summary = "Submit KYC documents")
     public ResponseEntity<CustomerResponse> submitKyc(
-            @PathVariable Long id,
+            @PathVariable("id") Long id,
             @Valid @RequestBody KycRequest request) {
         return ResponseEntity.ok(customerService.submitKyc(id, request));
     }
