@@ -1,6 +1,7 @@
 package com.banking.account.repository;
 
 import com.banking.account.entity.Account;
+import com.banking.account.enums.AccountStatus;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,6 +12,6 @@ import java.util.Optional;
 public interface AccountRepository extends JpaRepository<Account, Long> {
     Optional<Account> findByAccountNumber(String accountNumber);
     List<Account> findByCustomerId(Long customerId);
-    List<Account> findByStatus(String status);
+    List<Account> findByStatus(AccountStatus status);
 }
 

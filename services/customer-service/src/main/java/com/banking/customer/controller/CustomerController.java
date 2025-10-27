@@ -12,6 +12,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/customers")
@@ -68,6 +69,31 @@ public class CustomerController {
     public ResponseEntity<String> bulkApprove(@Valid @RequestBody ApprovalRequest request) {
         customerService.bulkApprove(request);
         return ResponseEntity.ok("Approvals processed successfully");
+    }
+    
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Delete customer profile")
+    public ResponseEntity<String> deleteCustomer(@PathVariable("id") Long id) {
+        customerService.deleteCustomer(id);
+        return ResponseEntity.ok("Customer deleted successfully");
+    }
+    
+    @PatchMapping("/{id}/status")
+    @Operation(summary = "Update customer status")
+    public ResponseEntity<CustomerResponse> updateCustomerStatus(
+            @PathVariable("id") Long id,
+            @RequestBody Map<String, String> statusUpdate) {
+        String status = statusUpdate.get("status");
+        return ResponseEntity.ok(customerService.updateCustomerStatus(id, status));
+    }
+    
+    @GetMapping("/search")
+    @Operation(summary = "Search customers")
+    public ResponseEntity<List<CustomerResponse>> searchCustomers(
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String phone) {
+        return ResponseEntity.ok(customerService.searchCustomers(name, email, phone));
     }
 }
 

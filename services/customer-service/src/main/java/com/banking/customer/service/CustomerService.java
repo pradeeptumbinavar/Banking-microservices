@@ -9,6 +9,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import com.banking.customer.enums.KYCStatus;
 
 @Service
 @RequiredArgsConstructor
@@ -25,7 +26,7 @@ public class CustomerService {
             .email(request.getEmail())
             .phone(request.getPhone())
             .address(request.getAddress())
-            .kycStatus("PENDING")
+            .kycStatus(KYCStatus.PENDING)
             .build();
         
         customer = customerRepository.save(customer);
@@ -60,20 +61,20 @@ public class CustomerService {
         
         customer.setKycDocumentType(request.getDocumentType());
         customer.setKycDocumentNumber(request.getDocumentNumber());
-        customer.setKycStatus("PENDING");
+        customer.setKycStatus(KYCStatus.PENDING);
         
         customer = customerRepository.save(customer);
         return toResponse(customer);
     }
     
     public List<ApprovalResponse> getPendingApprovals() {
-        List<Customer> pendingCustomers = customerRepository.findByKycStatus("PENDING");
+        List<Customer> pendingCustomers = customerRepository.findByKycStatus(KYCStatus.PENDING);
         
         return pendingCustomers.stream()
             .map(c -> new ApprovalResponse(
                 c.getId(),
                 "CUSTOMER_KYC",
-                c.getKycStatus(),
+                c.getKycStatus().name(),
                 "KYC approval for " + c.getFirstName() + " " + c.getLastName()
             ))
             .collect(Collectors.toList());
@@ -83,8 +84,50 @@ public class CustomerService {
     public void bulkApprove(ApprovalRequest request) {
         List<Customer> customers = customerRepository.findAllById(request.getIds());
         
-        customers.forEach(c -> c.setKycStatus(request.getStatus()));
+        customers.forEach(c -> c.setKycStatus(KYCStatus.valueOf(request.getStatus().toUpperCase())));
         customerRepository.saveAll(customers);
+    }
+    
+    @Transactional
+    public void deleteCustomer(Long id) {
+        Customer customer = customerRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Customer not found"));
+        customerRepository.delete(customer);
+    }
+    
+    @Transactional
+    public CustomerResponse updateCustomerStatus(Long id, String status) {
+        Customer customer = customerRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Customer not found"));
+        
+        // Validate status
+        try {
+            KYCStatus kycStatus = KYCStatus.valueOf(status.toUpperCase());
+            customer.setKycStatus(kycStatus);
+        } catch (IllegalArgumentException e) {
+            throw new RuntimeException("Invalid status: " + status);
+        }
+        
+        customer = customerRepository.save(customer);
+        return toResponse(customer);
+    }
+    
+    public List<CustomerResponse> searchCustomers(String name, String email, String phone) {
+        List<Customer> customers;
+        
+        if (name != null && !name.isEmpty()) {
+            customers = customerRepository.findByFirstNameContainingIgnoreCaseOrLastNameContainingIgnoreCase(name, name);
+        } else if (email != null && !email.isEmpty()) {
+            customers = customerRepository.findByEmailContainingIgnoreCase(email);
+        } else if (phone != null && !phone.isEmpty()) {
+            customers = customerRepository.findByPhoneContaining(phone);
+        } else {
+            customers = customerRepository.findAll();
+        }
+        
+        return customers.stream()
+            .map(this::toResponse)
+            .collect(Collectors.toList());
     }
     
     private CustomerResponse toResponse(Customer customer) {
@@ -96,7 +139,7 @@ public class CustomerService {
             .email(customer.getEmail())
             .phone(customer.getPhone())
             .address(customer.getAddress())
-            .kycStatus(customer.getKycStatus())
+            .kycStatus(customer.getKycStatus().name())
             .createdAt(customer.getCreatedAt())
             .updatedAt(customer.getUpdatedAt())
             .build();

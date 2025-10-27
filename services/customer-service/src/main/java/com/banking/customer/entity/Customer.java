@@ -1,5 +1,6 @@
 package com.banking.customer.entity;
 
+import com.banking.customer.enums.KYCStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -37,7 +38,8 @@ public class Customer {
     private String address;
     
     @Column(nullable = false)
-    private String kycStatus; // PENDING, APPROVED, REJECTED
+    @Enumerated(EnumType.STRING)
+    private KYCStatus kycStatus;
     
     private String kycDocumentType;
     
@@ -54,7 +56,7 @@ public class Customer {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
         if (kycStatus == null) {
-            kycStatus = "PENDING";
+            kycStatus = KYCStatus.PENDING;
         }
     }
     

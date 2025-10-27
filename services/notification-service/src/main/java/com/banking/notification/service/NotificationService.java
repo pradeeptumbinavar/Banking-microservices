@@ -3,6 +3,8 @@ package com.banking.notification.service;
 import com.banking.notification.dto.NotificationRequest;
 import com.banking.notification.dto.NotificationResponse;
 import com.banking.notification.entity.Notification;
+import com.banking.notification.enums.NotificationStatus;
+import com.banking.notification.enums.NotificationType;
 import com.banking.notification.repository.NotificationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,17 +22,17 @@ public class NotificationService {
     public NotificationResponse sendNotification(NotificationRequest request) {
         Notification notification = Notification.builder()
             .userId(request.getUserId())
-            .type(request.getType())
+            .type(NotificationType.valueOf(request.getType().toUpperCase()))
             .recipient(request.getRecipient())
             .subject(request.getSubject())
             .message(request.getMessage())
-            .status("PENDING")
+            .status(NotificationStatus.PENDING)
             .build();
         
         notification = notificationRepository.save(notification);
         
         // Simulate sending (in real app, integrate with email/SMS providers)
-        notification.setStatus("SENT");
+        notification.setStatus(NotificationStatus.SENT);
         notification.setSentAt(LocalDateTime.now());
         notification = notificationRepository.save(notification);
         
@@ -47,11 +49,11 @@ public class NotificationService {
         return NotificationResponse.builder()
             .id(notification.getId())
             .userId(notification.getUserId())
-            .type(notification.getType())
+            .type(notification.getType().name())
             .recipient(notification.getRecipient())
             .subject(notification.getSubject())
             .message(notification.getMessage())
-            .status(notification.getStatus())
+            .status(notification.getStatus().name())
             .createdAt(notification.getCreatedAt())
             .sentAt(notification.getSentAt())
             .build();

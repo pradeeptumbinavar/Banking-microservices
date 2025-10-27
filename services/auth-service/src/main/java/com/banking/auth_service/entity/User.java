@@ -1,5 +1,6 @@
 package com.banking.auth_service.entity;
 
+import com.banking.auth_service.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,7 +34,8 @@ public class User {
     private String password;
     
     @Column(nullable = false, length = 50)
-    private String role; // CUSTOMER, ADMIN
+    @Enumerated(EnumType.STRING)
+    private UserRole role;
     
     @Column(name = "enabled", nullable = false)
     @Builder.Default

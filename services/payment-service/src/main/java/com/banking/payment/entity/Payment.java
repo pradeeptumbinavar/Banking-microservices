@@ -1,5 +1,7 @@
 package com.banking.payment.entity;
 
+import com.banking.payment.enums.PaymentType;
+import com.banking.payment.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -33,10 +35,12 @@ public class Payment {
     private String currency;
     
     @Column(nullable = false)
-    private String paymentType; // TRANSFER, BILL_PAYMENT, WITHDRAWAL
+    @Enumerated(EnumType.STRING)
+    private PaymentType paymentType;
     
     @Column(nullable = false)
-    private String status; // PENDING, COMPLETED, FAILED, REJECTED
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus status;
     
     private String description;
     
@@ -51,7 +55,7 @@ public class Payment {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
         if (status == null) {
-            status = "PENDING";
+            status = PaymentStatus.PENDING;
         }
         if (currency == null) {
             currency = "USD";

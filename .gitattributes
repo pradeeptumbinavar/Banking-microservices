@@ -19,6 +19,25 @@ mvnw text eol=lf
 *.md text eol=lf
 *.pem text eol=lf
 
+# Frontend / JavaScript / TypeScript
+*.js text eol=lf
+*.jsx text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.json text eol=lf
+*.css text eol=lf
+*.scss text eol=lf
+*.sass text eol=lf
+*.less text eol=lf
+*.html text eol=lf
+*.htm text eol=lf
+*.vue text eol=lf
+*.svelte text eol=lf
+package.json text eol=lf
+package-lock.json text eol=lf
+yarn.lock text eol=lf
+pnpm-lock.yaml text eol=lf
+
 # Binary files (no EOL conversion)
 *.jar binary
 *.zip binary
@@ -28,3 +47,13 @@ mvnw text eol=lf
 *.jpg binary
 *.jpeg binary
 *.gif binary
+*.ico binary
+*.svg binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.eot binary
+*.otf binary
+*.webp binary
+*.mp4 binary
+*.webm binary

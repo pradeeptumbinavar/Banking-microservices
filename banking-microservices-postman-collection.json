@@ -1,0 +1,1940 @@
+{
+	"info": {
+		"_postman_id": "banking-microservices-collection",
+		"name": "Banking Microservices API",
+		"description": "Complete API collection for Banking Microservices via API Gateway",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "jwt_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refresh_token",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "user_id",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "Auth Service",
+			"item": [
+				{
+					"name": "Register User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    if (response.id) {",
+									"        pm.collectionVariables.set('user_id', response.id);",
+									"    }",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"email\": \"testuser@example.com\",\n    \"password\": \"Password123!\",\n    \"role\": \"CUSTOMER\",\n    \"mfaEnabled\": false\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/signup",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"signup"
+							]
+						},
+						"description": "Register a new user with role CUSTOMER or ADMIN"
+					},
+					"response": []
+				},
+				{
+					"name": "Login",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('jwt_token', response.accessToken);",
+									"    pm.collectionVariables.set('refresh_token', response.refreshToken);",
+									"    pm.collectionVariables.set('user_id', response.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"Password123!\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/signin",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"signin"
+							]
+						},
+						"description": "Authenticate user and receive JWT tokens"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    const response = pm.response.json();",
+									"    pm.collectionVariables.set('jwt_token', response.accessToken);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"refreshToken\": \"{{refresh_token}}\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/refresh",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Generate a new access token using refresh token"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Current User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/me",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"me"
+							]
+						},
+						"description": "Get authenticated user information"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users"
+							]
+						},
+						"description": "Retrieve all users (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User By ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/users/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{user_id}}"
+								}
+							]
+						},
+						"description": "Get user by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"newemail@example.com\",\n    \"role\": \"CUSTOMER\",\n    \"enabled\": true\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/auth/users/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "{{user_id}}"
+								}
+							]
+						},
+						"description": "Update user information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/users/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Delete user account (Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Public Key",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/public-key",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"public-key"
+							]
+						},
+						"description": "Retrieve RSA public key for JWT validation"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/auth/logout",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Invalidate refresh token and logout user"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication and user management endpoints"
+		},
+		{
+			"name": "Customer Service",
+			"item": [
+				{
+					"name": "Create Customer Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"dateOfBirth\": \"1990-01-15\",\n    \"phone\": \"+1234567890\",\n    \"address\": \"123 Main St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zipCode\": \"10001\",\n    \"country\": \"USA\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customers",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customers"
+							]
+						},
+						"description": "Create a new customer profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Customer By ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/customers/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get customer profile by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Customer Profile",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"firstName\": \"John\",\n    \"lastName\": \"Doe\",\n    \"dateOfBirth\": \"1990-01-15\",\n    \"phone\": \"+1234567890\",\n    \"address\": \"456 New St\",\n    \"city\": \"New York\",\n    \"state\": \"NY\",\n    \"zipCode\": \"10001\",\n    \"country\": \"USA\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customers/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Update customer profile"
+					},
+					"response": []
+				},
+				{
+					"name": "Submit KYC Documents",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"documentType\": \"PASSPORT\",\n    \"documentNumber\": \"A12345678\",\n    \"documentUrl\": \"https://example.com/docs/passport.pdf\",\n    \"expiryDate\": \"2030-12-31\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customers/:id/kyc",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customers",
+								":id",
+								"kyc"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Submit KYC documents for verification"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending KYC Approvals",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/customers/approvals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customers",
+								"approvals"
+							]
+						},
+						"description": "Get pending KYC approvals"
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Approve/Reject KYC",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"itemIds\": [1, 2, 3],\n    \"action\": \"APPROVE\",\n    \"comments\": \"Documents verified\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customers/approvals/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customers",
+								"approvals",
+								"bulk"
+							]
+						},
+						"description": "Bulk approve or reject KYC requests"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Customer Status",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"ACTIVE\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/customers/:id/status",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customers",
+								":id",
+								"status"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Update customer status"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Customers",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/customers/search?name=John&email=john@example.com",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customers",
+								"search"
+							],
+							"query": [
+								{
+									"key": "name",
+									"value": "John"
+								},
+								{
+									"key": "email",
+									"value": "john@example.com"
+								},
+								{
+									"key": "phone",
+									"value": "",
+									"disabled": true
+								}
+							]
+						},
+						"description": "Search customers by name, email, or phone"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Customer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/customers/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"customers",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Delete customer profile"
+					},
+					"response": []
+				}
+			],
+			"description": "Customer profile and KYC management endpoints"
+		},
+		{
+			"name": "Account Service",
+			"item": [
+				{
+					"name": "Create Account",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"accountType\": \"SAVINGS\",\n    \"currency\": \"USD\",\n    \"initialDeposit\": 1000.00\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/accounts",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts"
+							]
+						},
+						"description": "Create a new bank account"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Account By ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/accounts/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get account details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Account Balance",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/accounts/:id/balance",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								":id",
+								"balance"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get account balance"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Accounts By User ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/accounts/user/:userId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								"user",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "{{user_id}}"
+								}
+							]
+						},
+						"description": "Get all accounts for a specific user"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Account",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"accountType\": \"CHECKING\",\n    \"status\": \"ACTIVE\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/accounts/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Update account details"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Account Approvals",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/accounts/approvals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								"approvals"
+							]
+						},
+						"description": "Get pending account approvals"
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Approve/Reject Accounts",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"itemIds\": [1, 2, 3],\n    \"action\": \"APPROVE\",\n    \"comments\": \"Account verified\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/accounts/approvals/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								"approvals",
+								"bulk"
+							]
+						},
+						"description": "Bulk approve or reject account requests"
+					},
+					"response": []
+				},
+				{
+					"name": "Close Account",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/accounts/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"accounts",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Close a bank account"
+					},
+					"response": []
+				}
+			],
+			"description": "Bank account management endpoints"
+		},
+		{
+			"name": "Payment Service",
+			"item": [
+				{
+					"name": "Create Fund Transfer",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fromAccountId\": 1,\n    \"toAccountId\": 2,\n    \"amount\": 100.00,\n    \"currency\": \"USD\",\n    \"description\": \"Payment for services\",\n    \"transferType\": \"INTERNAL\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/payments/transfer",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								"transfer"
+							]
+						},
+						"description": "Create a fund transfer between accounts"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payment By ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/payments/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get payment details by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Payments By User ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/payments/user/:userId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								"user",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "{{user_id}}"
+								}
+							]
+						},
+						"description": "Get all payments for a specific user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Payment Approvals",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/payments/approvals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								"approvals"
+							]
+						},
+						"description": "Get pending payment approvals"
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Approve/Reject Payments",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"itemIds\": [1, 2, 3],\n    \"action\": \"APPROVE\",\n    \"comments\": \"Payment verified\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/payments/approvals/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								"approvals",
+								"bulk"
+							]
+						},
+						"description": "Bulk approve or reject payment requests"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Payment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"COMPLETED\",\n    \"description\": \"Updated payment description\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/payments/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Update payment details"
+					},
+					"response": []
+				},
+				{
+					"name": "Cancel Payment",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/payments/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"payments",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Cancel a payment"
+					},
+					"response": []
+				}
+			],
+			"description": "Payment and fund transfer endpoints"
+		},
+		{
+			"name": "Credit Service",
+			"item": [
+				{
+					"name": "Apply for Loan",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"loanType\": \"PERSONAL\",\n    \"amount\": 10000.00,\n    \"currency\": \"USD\",\n    \"tenure\": 36,\n    \"interestRate\": 8.5,\n    \"purpose\": \"Home renovation\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/credits/loans",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"credits",
+								"loans"
+							]
+						},
+						"description": "Apply for a loan"
+					},
+					"response": []
+				},
+				{
+					"name": "Apply for Credit Card",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"cardType\": \"GOLD\",\n    \"creditLimit\": 5000.00,\n    \"currency\": \"USD\",\n    \"interestRate\": 18.0\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/credits/cards",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"credits",
+								"cards"
+							]
+						},
+						"description": "Apply for a credit card"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Credit Products By User ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/credits/user/:userId",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"credits",
+								"user",
+								":userId"
+							],
+							"variable": [
+								{
+									"key": "userId",
+									"value": "{{user_id}}"
+								}
+							]
+						},
+						"description": "Get all credit products for a specific user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Credit Approvals",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/credits/approvals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"credits",
+								"approvals"
+							]
+						},
+						"description": "Get pending credit approvals"
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Approve/Reject Credits",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"itemIds\": [1, 2, 3],\n    \"action\": \"APPROVE\",\n    \"comments\": \"Credit application approved\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/credits/approvals/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"credits",
+								"approvals",
+								"bulk"
+							]
+						},
+						"description": "Bulk approve or reject credit applications"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Credit Product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"status\": \"ACTIVE\",\n    \"interestRate\": 7.5\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/credits/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"credits",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Update credit product details"
+					},
+					"response": []
+				},
+				{
+					"name": "Close Credit Product",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/credits/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"credits",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Close or cancel a credit product"
+					},
+					"response": []
+				}
+			],
+			"description": "Credit product and loan management endpoints"
+		},
+		{
+			"name": "Admin Service",
+			"item": [
+				{
+					"name": "Get Pending Customer KYC Approvals",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/customers/approvals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"customers",
+								"approvals"
+							]
+						},
+						"description": "Get pending customer KYC approvals from admin service"
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Approve/Reject Customer KYC (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"itemIds\": [1, 2, 3],\n    \"action\": \"APPROVE\",\n    \"comments\": \"KYC verified by admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/customers/approvals/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"customers",
+								"approvals",
+								"bulk"
+							]
+						},
+						"description": "Bulk approve or reject customer KYC from admin service"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Account Approvals (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/accounts/approvals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"accounts",
+								"approvals"
+							]
+						},
+						"description": "Get pending account approvals from admin service"
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Approve/Reject Accounts (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"itemIds\": [1, 2, 3],\n    \"action\": \"APPROVE\",\n    \"comments\": \"Accounts verified by admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/accounts/approvals/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"accounts",
+								"approvals",
+								"bulk"
+							]
+						},
+						"description": "Bulk approve or reject accounts from admin service"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Credit Approvals (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/credits/approvals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"credits",
+								"approvals"
+							]
+						},
+						"description": "Get pending credit approvals from admin service"
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Approve/Reject Credits (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"itemIds\": [1, 2, 3],\n    \"action\": \"APPROVE\",\n    \"comments\": \"Credit applications verified by admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/credits/approvals/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"credits",
+								"approvals",
+								"bulk"
+							]
+						},
+						"description": "Bulk approve or reject credits from admin service"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Pending Payment Approvals (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/admin/payments/approvals",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"payments",
+								"approvals"
+							]
+						},
+						"description": "Get pending payment approvals from admin service"
+					},
+					"response": []
+				},
+				{
+					"name": "Bulk Approve/Reject Payments (Admin)",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"itemIds\": [1, 2, 3],\n    \"action\": \"APPROVE\",\n    \"comments\": \"Payments verified by admin\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/admin/payments/approvals/bulk",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"admin",
+								"payments",
+								"approvals",
+								"bulk"
+							]
+						},
+						"description": "Bulk approve or reject payments from admin service"
+					},
+					"response": []
+				}
+			],
+			"description": "Admin aggregation and approval management endpoints"
+		},
+		{
+			"name": "Notification Service",
+			"item": [
+				{
+					"name": "Send Notification",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"userId\": {{user_id}},\n    \"type\": \"EMAIL\",\n    \"subject\": \"Test Notification\",\n    \"message\": \"This is a test notification\",\n    \"priority\": \"HIGH\"\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/notifications/send",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notifications",
+								"send"
+							]
+						},
+						"description": "Send a notification to a user"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Notification By ID",
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{jwt_token}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{base_url}}/notifications/:id",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"notifications",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "1"
+								}
+							]
+						},
+						"description": "Get notification details by ID"
+					},
+					"response": []
+				}
+			],
+			"description": "Notification delivery endpoints"
+		}
+	]
+}
+

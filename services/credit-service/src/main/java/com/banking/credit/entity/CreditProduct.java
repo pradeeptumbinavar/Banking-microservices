@@ -1,5 +1,7 @@
 package com.banking.credit.entity;
 
+import com.banking.credit.enums.CreditProductType;
+import com.banking.credit.enums.CreditProductStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,7 +26,8 @@ public class CreditProduct {
     private Long customerId;
     
     @Column(nullable = false)
-    private String productType; // LOAN, CREDIT_CARD
+    @Enumerated(EnumType.STRING)
+    private CreditProductType productType;
     
     @Column(precision = 19, scale = 2)
     private BigDecimal amount; // For loans
@@ -38,7 +41,8 @@ public class CreditProduct {
     private Integer termMonths; // For loans
     
     @Column(nullable = false)
-    private String status; // PENDING, APPROVED, REJECTED, ACTIVE, CLOSED
+    @Enumerated(EnumType.STRING)
+    private CreditProductStatus status;
     
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -51,7 +55,7 @@ public class CreditProduct {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
         if (status == null) {
-            status = "PENDING";
+            status = CreditProductStatus.PENDING;
         }
     }
     

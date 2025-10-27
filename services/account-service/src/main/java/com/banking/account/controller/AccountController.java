@@ -51,5 +51,26 @@ public class AccountController {
         accountService.bulkApprove(request);
         return ResponseEntity.ok("Approvals processed successfully");
     }
+    
+    @PutMapping("/{id}")
+    @Operation(summary = "Update account details")
+    public ResponseEntity<AccountResponse> updateAccount(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody AccountUpdateRequest request) {
+        return ResponseEntity.ok(accountService.updateAccount(id, request));
+    }
+    
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Close account")
+    public ResponseEntity<String> closeAccount(@PathVariable("id") Long id) {
+        accountService.closeAccount(id);
+        return ResponseEntity.ok("Account closed successfully");
+    }
+    
+    @GetMapping("/user/{userId}")
+    @Operation(summary = "Get accounts by user ID")
+    public ResponseEntity<List<AccountResponse>> getAccountsByUserId(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(accountService.getAccountsByUserId(userId));
+    }
 }
 

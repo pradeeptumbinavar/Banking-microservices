@@ -45,5 +45,26 @@ public class CreditController {
         creditService.bulkApprove(request);
         return ResponseEntity.ok("Approvals processed successfully");
     }
+    
+    @PutMapping("/{id}")
+    @Operation(summary = "Update credit product details")
+    public ResponseEntity<CreditProductResponse> updateCreditProduct(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody CreditProductUpdateRequest request) {
+        return ResponseEntity.ok(creditService.updateCreditProduct(id, request));
+    }
+    
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Close or cancel credit product")
+    public ResponseEntity<String> closeCreditProduct(@PathVariable("id") Long id) {
+        creditService.closeCreditProduct(id);
+        return ResponseEntity.ok("Credit product closed successfully");
+    }
+    
+    @GetMapping("/user/{userId}")
+    @Operation(summary = "Get credit products by user ID")
+    public ResponseEntity<List<CreditProductResponse>> getCreditProductsByUserId(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(creditService.getCreditProductsByUserId(userId));
+    }
 }
 

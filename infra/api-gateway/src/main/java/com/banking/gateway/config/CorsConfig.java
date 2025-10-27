@@ -1,4 +1,4 @@
-package com.banking.auth_service.config;
+package com.banking.gateway.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,10 +9,10 @@ import org.springframework.web.filter.CorsFilter;
 import java.util.Arrays;
 
 /**
- * CORS configuration for allowing cross-origin requests.
- * Adjust allowed origins based on your frontend application URLs.
+ * CORS configuration for API Gateway (Servlet-based).
+ * Allows cross-origin requests from frontend (localhost:3000).
  */
-@Configuration 
+@Configuration
 public class CorsConfig {
     
     @Bean
@@ -23,9 +23,7 @@ public class CorsConfig {
         // Allow credentials (cookies, authorization headers)
         config.setAllowCredentials(true);
         
-        // Allow all origins (for development only!)
-        // In production, specify exact origins:
-        // config.setAllowedOrigins(Arrays.asList("http://your-frontend-url.com"));
+        // Allow frontend origin (for development)
         config.setAllowedOriginPatterns(Arrays.asList("*"));
         
         // Allow all headers
@@ -33,6 +31,9 @@ public class CorsConfig {
         
         // Allow all HTTP methods
         config.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"));
+        
+        // Expose headers to frontend
+        config.setExposedHeaders(Arrays.asList("Authorization"));
         
         // Cache preflight response for 1 hour
         config.setMaxAge(3600L);
@@ -43,3 +44,4 @@ public class CorsConfig {
         return new CorsFilter(source);
     }
 }
+

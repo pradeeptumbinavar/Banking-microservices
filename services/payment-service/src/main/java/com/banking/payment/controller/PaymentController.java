@@ -45,5 +45,26 @@ public class PaymentController {
         paymentService.bulkApprove(request);
         return ResponseEntity.ok("Approvals processed successfully");
     }
+    
+    @PutMapping("/{id}")
+    @Operation(summary = "Update payment details")
+    public ResponseEntity<PaymentResponse> updatePayment(
+            @PathVariable("id") Long id,
+            @Valid @RequestBody PaymentUpdateRequest request) {
+        return ResponseEntity.ok(paymentService.updatePayment(id, request));
+    }
+    
+    @DeleteMapping("/{id}")
+    @Operation(summary = "Cancel payment")
+    public ResponseEntity<String> cancelPayment(@PathVariable("id") Long id) {
+        paymentService.cancelPayment(id);
+        return ResponseEntity.ok("Payment cancelled successfully");
+    }
+    
+    @GetMapping("/user/{userId}")
+    @Operation(summary = "Get payments by user ID")
+    public ResponseEntity<List<PaymentResponse>> getPaymentsByUserId(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(paymentService.getPaymentsByUserId(userId));
+    }
 }
 

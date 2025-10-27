@@ -1,5 +1,7 @@
 package com.banking.account.entity;
 
+import com.banking.account.enums.AccountType;
+import com.banking.account.enums.AccountStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,7 +29,8 @@ public class Account {
     private String accountNumber;
     
     @Column(nullable = false)
-    private String accountType; // SAVINGS, CHECKING, BUSINESS
+    @Enumerated(EnumType.STRING)
+    private AccountType accountType;
     
     @Column(nullable = false, precision = 19, scale = 2)
     @Builder.Default
@@ -37,7 +40,8 @@ public class Account {
     private String currency; // USD, EUR, etc.
     
     @Column(nullable = false)
-    private String status; // PENDING, ACTIVE, SUSPENDED, CLOSED
+    @Enumerated(EnumType.STRING)
+    private AccountStatus status;
     
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -50,7 +54,7 @@ public class Account {
         createdAt = LocalDateTime.now();
         updatedAt = LocalDateTime.now();
         if (status == null) {
-            status = "PENDING";
+            status = AccountStatus.PENDING;
         }
         if (currency == null) {
             currency = "USD";

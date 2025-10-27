@@ -1,5 +1,7 @@
 package com.banking.notification.entity;
 
+import com.banking.notification.enums.NotificationType;
+import com.banking.notification.enums.NotificationStatus;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -23,7 +25,8 @@ public class Notification {
     private Long userId;
     
     @Column(nullable = false)
-    private String type; // EMAIL, SMS, PUSH
+    @Enumerated(EnumType.STRING)
+    private NotificationType type;
     
     @Column(nullable = false)
     private String recipient;
@@ -35,7 +38,8 @@ public class Notification {
     private String message;
     
     @Column(nullable = false)
-    private String status; // PENDING, SENT, FAILED
+    @Enumerated(EnumType.STRING)
+    private NotificationStatus status;
     
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -47,7 +51,7 @@ public class Notification {
     protected void onCreate() {
         createdAt = LocalDateTime.now();
         if (status == null) {
-            status = "PENDING";
+            status = NotificationStatus.PENDING;
         }
     }
 }

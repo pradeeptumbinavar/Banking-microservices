@@ -55,7 +55,7 @@ public class UserDetailsImpl implements UserDetails {
      */
     public static UserDetailsImpl build(User user) {
         List<GrantedAuthority> authorities = Collections.singletonList(
-            new SimpleGrantedAuthority(user.getRole())
+            new SimpleGrantedAuthority(user.getRole().name())
         );
         
         return new UserDetailsImpl(
@@ -63,7 +63,7 @@ public class UserDetailsImpl implements UserDetails {
             user.getUsername(),
             user.getEmail(),
             user.getPassword(),
-            user.getRole(),
+            user.getRole().name(),
             user.isMfaEnabled(),
             user.getMfaSecret(),
             user.isAccountNonLocked(),
