@@ -39,6 +39,12 @@ public class CustomerService {
         return toResponse(customer);
     }
     
+    public CustomerResponse getCustomerByUserId(Long userId) {
+        Customer customer = customerRepository.findByUserId(userId)
+            .orElseThrow(() -> new RuntimeException("Customer not found for user ID: " + userId));
+        return toResponse(customer);
+    }
+    
     @Transactional
     public CustomerResponse updateCustomer(Long id, CustomerRequest request) {
         Customer customer = customerRepository.findById(id)

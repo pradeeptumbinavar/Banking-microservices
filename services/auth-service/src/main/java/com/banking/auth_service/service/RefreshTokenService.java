@@ -38,20 +38,28 @@ public class RefreshTokenService {
     }
     
     /**
-     * Create new refresh token for user.
+     * Create or rotate refresh token for a user.
+     * Ensures a single refresh token row per user (One-to-One mapping).
      */
+    @Transactional
     public RefreshToken createRefreshToken(Long userId) {
-        RefreshToken refreshToken = new RefreshToken();
-        
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
-        
-        refreshToken.setUser(user);
-        refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
-        refreshToken.setToken(UUID.randomUUID().toString());
-        
-        refreshToken = refreshTokenRepository.save(refreshToken);
-        return refreshToken;
+
+        // Prefer updating existing row to reduce churn; fall back to insert if none
+        return refreshTokenRepository.findByUserId(userId)
+            .map(existing -> {
+                existing.setToken(UUID.randomUUID().toString());
+                existing.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+                return refreshTokenRepository.save(existing);
+            })
+            .orElseGet(() -> {
+                RefreshToken refreshToken = new RefreshToken();
+                refreshToken.setUser(user);
+                refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
+                refreshToken.setToken(UUID.randomUUID().toString());
+                return refreshTokenRepository.save(refreshToken);
+            });
     }
     
     /**

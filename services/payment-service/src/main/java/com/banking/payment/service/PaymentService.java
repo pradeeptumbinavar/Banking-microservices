@@ -20,13 +20,21 @@ public class PaymentService {
     
     @Transactional
     public PaymentResponse createTransfer(TransferRequest request) {
+        // Approval threshold: amounts greater than 50,000 require approval (PENDING)
+        // Otherwise, auto-complete the payment (COMPLETED)
+        var amount = request.getAmount();
+        var threshold = new java.math.BigDecimal("50000");
+        var status = (amount != null && amount.compareTo(threshold) > 0)
+            ? PaymentStatus.PENDING
+            : PaymentStatus.COMPLETED;
+
         Payment payment = Payment.builder()
             .fromAccountId(request.getFromAccountId())
             .toAccountId(request.getToAccountId())
             .amount(request.getAmount())
             .currency(request.getCurrency() != null ? request.getCurrency() : "USD")
             .paymentType(PaymentType.TRANSFER)
-            .status(PaymentStatus.PENDING)
+            .status(status)
             .description(request.getDescription())
             .build();
         

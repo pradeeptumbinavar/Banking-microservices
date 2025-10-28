@@ -42,6 +42,12 @@ public class CustomerController {
         return ResponseEntity.ok(customerService.getCustomer(id));
     }
     
+    @GetMapping("/user/{userId}")
+    @Operation(summary = "Get customer by user ID")
+    public ResponseEntity<CustomerResponse> getCustomerByUserId(@PathVariable("userId") Long userId) {
+        return ResponseEntity.ok(customerService.getCustomerByUserId(userId));
+    }
+    
     @PutMapping("/{id}")
     @Operation(summary = "Update customer profile")
     public ResponseEntity<CustomerResponse> updateCustomer(
