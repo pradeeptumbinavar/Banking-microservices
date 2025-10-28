@@ -1,37 +1,52 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { accountService } from '../../services/accountService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
+import { formatCurrencyAmount } from '../../utils/currency';
 import { toast } from 'react-toastify';
 
 const CustomerDashboard = () => {
   const { user } = useAuth();
+  const location = useLocation();
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchAccounts = async () => {
-      try {
-        const data = await accountService.getAccountsByUserId(user.id);
-        setAccounts(data);
-      } catch (error) {
-        console.error('Failed to fetch accounts:', error);
-        toast.error('Failed to fetch accounts');
-      } finally {
-        setLoading(false);
+  const fetchAccounts = useCallback(async () => {
+    setLoading(true);
+    try {
+      const lookupId = user?.customerId || user?.id;
+      if (!lookupId) {
+        toast.error('Unable to determine customer. Please re-login.');
+        setAccounts([]);
+        return;
       }
-    };
+      const data = await accountService.getAccountsByUserId(lookupId);
+      setAccounts(data);
+    } catch (error) {
+      console.error('Failed to fetch accounts:', error);
+      const msg = error.response?.data?.message || error.message || 'Failed to fetch accounts';
+      toast.error(msg);
+    } finally {
+      setLoading(false);
+    }
+  }, [user?.customerId, user?.id]);
 
-    fetchAccounts();
-  }, [user.id]);
+  useEffect(() => { fetchAccounts(); }, [fetchAccounts]);
+  // Refresh after navigations that request refresh
+  useEffect(() => {
+    if (location.state?.refresh === 'accounts') {
+      fetchAccounts();
+    }
+  }, [location.state, fetchAccounts]);
 
   if (loading) {
     return <LoadingSpinner text="Loading dashboard..." />;
   }
 
   const totalBalance = accounts.reduce((sum, acc) => sum + (acc.balance || 0), 0);
+  const activeCount = accounts.filter(a => a.status === 'ACTIVE').length;
 
   return (
     <Container fluid className="dashboard-container" style={{ background: 'var(--background-color)', minHeight: '100vh' }}>
@@ -56,7 +71,7 @@ const CustomerDashboard = () => {
                     Total Balance
                   </p>
                   <h2 className="fw-bold mb-0" style={{ fontSize: '2rem', color: 'var(--gray-900)' }}>
-                    ${totalBalance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {formatCurrencyAmount(accounts[0]?.currency || 'USD', totalBalance)}
                   </h2>
                 </div>
                 <div 
@@ -88,7 +103,7 @@ const CustomerDashboard = () => {
                     Active Accounts
                   </p>
                   <h2 className="fw-bold mb-0" style={{ fontSize: '2rem', color: 'var(--gray-900)' }}>
-                    {accounts.length}
+                    {activeCount}
                   </h2>
                 </div>
                 <div 
@@ -261,10 +276,10 @@ const CustomerDashboard = () => {
                         </div>
                         <div className="text-end">
                           <h5 className="fw-bold mb-1" style={{ color: 'var(--gray-900)' }}>
-                            ${account.balance?.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) || '0.00'}
+                            {formatCurrencyAmount(account.currency, account.balance)}
                           </h5>
                           <span 
-                            className={`badge ${account.status === 'ACTIVE' ? 'bg-success' : 'bg-warning'}`}
+                            className={`badge ${account.status === 'ACTIVE' ? 'bg-success' : account.status === 'PENDING' ? 'bg-warning' : account.status === 'SUSPENDED' ? 'bg-danger' : 'bg-secondary'}`}
                             style={{
                               padding: '0.375rem 0.75rem',
                               borderRadius: 'var(--radius-full)',

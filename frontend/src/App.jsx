@@ -27,6 +27,9 @@ import UserManagementPage from './pages/admin/UserManagementPage';
 // Common Pages
 import NotFound from './pages/common/NotFound';
 import Forbidden from './pages/common/Forbidden';
+import KYCPendingPage from './pages/common/KYCPendingPage';
+import OnboardingProfilePage from './pages/onboarding/OnboardingProfilePage';
+import OnboardingKycPage from './pages/onboarding/OnboardingKycPage';
 
 // Protected Route Component
 import RequireRole from './components/auth/RequireRole';
@@ -36,11 +39,18 @@ const App = () => {
 
   return (
     <>
-      {isAuthenticated && <Navbar />}
+      <Navbar />
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
         <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} />
+        
+        {/* KYC Pending Route - Authenticated but not approved */}
+        <Route path="/kyc-pending" element={isAuthenticated ? <KYCPendingPage /> : <Navigate to="/login" />} />
+
+        {/* Onboarding Routes */}
+        <Route path="/onboarding/profile" element={isAuthenticated ? <OnboardingProfilePage /> : <Navigate to="/login" />} />
+        <Route path="/onboarding/kyc" element={isAuthenticated ? <OnboardingKycPage /> : <Navigate to="/login" />} />
 
         {/* Customer Protected Routes */}
         <Route path="/dashboard" element={

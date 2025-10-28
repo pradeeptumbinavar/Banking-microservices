@@ -151,9 +151,13 @@ body {
 /* Navbar Styles - Clean & Elevated */
 .navbar {
   box-shadow: var(--shadow-md);
-  background: var(--lighter-color) !important;
   padding: var(--spacing-lg) 0;
   backdrop-filter: blur(10px);
+}
+
+/* Ensure dark navbar renders correctly over any base styles */
+.navbar-dark.bg-dark {
+  background-color: #212529 !important;
 }
 
 /* Table Styles - Spacious */

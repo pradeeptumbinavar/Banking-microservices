@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Container, Row, Col, Card, Button, Table } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { formatCurrencyAmount } from '../../utils/currency';
 import { accountService } from '../../services/accountService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { toast } from 'react-toastify';
@@ -14,17 +15,23 @@ const AccountsPage = () => {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const data = await accountService.getAccountsByUserId(user.id);
+        const lookupId = user?.customerId || user?.id;
+        if (!lookupId) {
+          toast.error('Unable to determine customer. Please re-login.');
+          return;
+        }
+        const data = await accountService.getAccountsByUserId(lookupId);
         setAccounts(data);
       } catch (error) {
-        toast.error('Failed to fetch accounts');
+        const msg = error.response?.data?.message || error.message || 'Failed to fetch accounts';
+        toast.error(msg);
       } finally {
         setLoading(false);
       }
     };
 
     fetchAccounts();
-  }, [user.id]);
+  }, [user?.customerId, user?.id]);
 
   if (loading) {
     return <LoadingSpinner text="Loading accounts..." />;
@@ -78,8 +85,7 @@ const AccountsPage = () => {
                   
                   <div className="mb-3">
                     <small className="text-muted d-block">Balance</small>
-                    <h3 className="mb-0">${account.balance?.toLocaleString() || '0'}</h3>
-                    <small className="text-muted">{account.currency}</small>
+                    <h3 className="mb-0">{formatCurrencyAmount(account.currency, account.balance)}</h3>
                   </div>
                   
                   <Button as={Link} to={`/accounts/${account.id}`} variant="outline-primary" className="w-100">

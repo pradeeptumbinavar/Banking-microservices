@@ -31,8 +31,11 @@ const Register = () => {
 
     try {
       const { confirmPassword, ...registerData } = formData;
-      await register(registerData);
-      navigate('/dashboard');
+      const result = await register(registerData);
+      // New flow: after signup, go to onboarding profile
+      if (result?.success) {
+        navigate('/onboarding/profile');
+      }
     } catch (err) {
       // Error handled in context
     }
@@ -187,30 +190,7 @@ const Register = () => {
                 </Col>
               </Row>
 
-              <Form.Group className="mb-5" controlId="role">
-                <Form.Label className="fw-semibold mb-3" style={{ fontSize: '1rem', color: 'var(--gray-700)' }}>
-                  Account Type
-                </Form.Label>
-                <Form.Select
-                  name="role"
-                  value={formData.role}
-                  onChange={handleChange}
-                  required
-                  style={{ 
-                    padding: '1.125rem 1.5rem',
-                    fontSize: '1.0625rem',
-                    borderRadius: '0.75rem',
-                    border: '2px solid var(--gray-200)',
-                    transition: 'all 0.2s'
-                  }}
-                >
-                  <option value="CUSTOMER">👤 Customer Account - Regular banking services</option>
-                  <option value="ADMIN">🛡️ Administrator Account - Full system access</option>
-                </Form.Select>
-                <Form.Text className="text-muted" style={{ fontSize: '0.9375rem' }}>
-                  Choose Customer for personal banking or Admin for administrative access
-                </Form.Text>
-              </Form.Group>
+              {/* Role is automatically set to CUSTOMER - Admin accounts are created manually */}
 
               <div className="mt-5 pt-2">
                 <Button 

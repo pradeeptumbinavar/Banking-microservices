@@ -31,6 +31,14 @@ export const authService = {
     return response.data;
   },
 
+  // Validate current access token
+  validateToken: async () => {
+    // Some backends expose POST /auth/validate; if only /auth/me exists, use that.
+    // We'll prefer /auth/me as it both validates and returns user info.
+    const response = await api.get('/auth/me');
+    return response.data;
+  },
+
   // Get all users (Admin only)
   getAllUsers: async () => {
     const response = await api.get('/auth/users');
@@ -52,6 +60,18 @@ export const authService = {
   // Delete user
   deleteUser: async (id) => {
     const response = await api.delete(`/auth/users/${id}`);
+    return response.data;
+  },
+
+  // Create customer profile (called automatically after registration)
+  createCustomer: async (customerData) => {
+    const response = await api.post('/customers', customerData);
+    return response.data;
+  },
+
+  // Get customer by user ID
+  getCustomerByUserId: async (userId) => {
+    const response = await api.get(`/customers/user/${userId}`);
     return response.data;
   },
 };

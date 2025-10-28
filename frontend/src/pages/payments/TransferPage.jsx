@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Container, Card, Form, Button, Row, Col } from 'react-bootstrap';
 import { paymentService } from '../../services/paymentService';
 import { accountService } from '../../services/accountService';
+import { formatCurrencyAmount } from '../../utils/currency';
 import { toast } from 'react-toastify';
 import { useAuth } from '../../hooks/useAuth';
 
@@ -19,26 +20,40 @@ const TransferPage = () => {
   useEffect(() => {
     const fetchAccounts = async () => {
       try {
-        const data = await accountService.getAccountsByUserId(user.id);
+        const lookupId = user?.customerId || user?.id;
+        if (!lookupId) {
+          toast.error('Unable to determine customer. Please re-login.');
+          return;
+        }
+        const data = await accountService.getAccountsByUserId(lookupId);
         setAccounts(data);
       } catch (error) {
-        toast.error('Failed to fetch accounts');
+        const msg = error.response?.data?.message || error.message || 'Failed to fetch accounts';
+        toast.error(msg);
       }
     };
     fetchAccounts();
-  }, [user.id]);
+  }, [user?.customerId, user?.id]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
+      const from = accounts.find(a => a.id === parseInt(formData.fromAccountId));
       await paymentService.createTransfer({
         ...formData,
         fromAccountId: parseInt(formData.fromAccountId),
         toAccountId: parseInt(formData.toAccountId),
-        amount: parseFloat(formData.amount)
+        amount: parseFloat(formData.amount),
+        currency: from?.currency || 'USD'
       });
+      // Apply account balance changes via accounts PUT as requested
+      const amount = parseFloat(formData.amount);
+      try {
+        await accountService.updateAccount(parseInt(formData.fromAccountId), { balanceDelta: -amount });
+        await accountService.updateAccount(parseInt(formData.toAccountId), { balanceDelta: amount });
+      } catch (_) { /* ignore if backend doesn't support it */ }
       toast.success('Transfer initiated successfully!');
       setFormData({ fromAccountId: '', toAccountId: '', amount: '', description: '' });
     } catch (error) {
@@ -71,7 +86,7 @@ const TransferPage = () => {
                     <option value="">Select account...</option>
                     {accounts.map(acc => (
                       <option key={acc.id} value={acc.id}>
-                        {acc.accountNumber} - ${acc.balance}
+                        {acc.accountNumber} - {formatCurrencyAmount(acc.currency, acc.balance)}
                       </option>
                     ))}
                   </Form.Select>

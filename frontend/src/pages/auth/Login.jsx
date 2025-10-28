@@ -11,8 +11,30 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await login(credentials);
-      navigate('/dashboard');
+      const result = await login(credentials);
+      if (result && result.user) {
+        const { role, customerId, kycStatus } = result.user;
+        if (role === 'ADMIN') {
+          navigate('/admin');
+          return;
+        }
+        // CUSTOMER routing: onboarding-first approach
+        if (!customerId) {
+          navigate('/onboarding/profile');
+          return;
+        }
+        if (!kycStatus) {
+          navigate('/onboarding/kyc');
+          return;
+        }
+        if (kycStatus === 'APPROVED') {
+          navigate('/dashboard');
+        } else if (kycStatus === 'REJECTED') {
+          navigate('/onboarding/kyc?resubmit=1');
+        } else {
+          navigate('/kyc-pending');
+        }
+      }
     } catch (err) {
       // Error handled in context
     }

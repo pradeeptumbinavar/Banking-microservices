@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { Container, Card, Form, Button } from 'react-bootstrap';
+import { Container, Card, Form, Button, InputGroup } from 'react-bootstrap';
 import { creditService } from '../../services/creditService';
 import { toast } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../hooks/useAuth';
 
 const LoanApplicationPage = () => {
+  const { user } = useAuth();
   const [formData, setFormData] = useState({
     amount: '',
-    interestRate: '5.5',
+    interestRate: '10',
     termMonths: '12'
   });
   const [loading, setLoading] = useState(false);
@@ -19,6 +21,7 @@ const LoanApplicationPage = () => {
 
     try {
       await creditService.applyForLoan({
+        customerId: user?.customerId || user?.id,
         amount: parseFloat(formData.amount),
         interestRate: parseFloat(formData.interestRate),
         termMonths: parseInt(formData.termMonths)
@@ -49,6 +52,22 @@ const LoanApplicationPage = () => {
                 required
               />
             </Form.Group>
+
+          <Form.Group className="mb-3">
+            <Form.Label>Interest Rate</Form.Label>
+            <InputGroup>
+              <Form.Control
+                type="number"
+                step="0.1"
+                min="0"
+                value={formData.interestRate}
+                onChange={(e) => setFormData({ ...formData, interestRate: e.target.value })}
+                required
+              />
+              <InputGroup.Text>%</InputGroup.Text>
+            </InputGroup>
+            <Form.Text className="text-muted">Default 10%</Form.Text>
+          </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Term (Months)</Form.Label>

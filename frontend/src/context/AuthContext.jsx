@@ -44,27 +44,39 @@ export const AuthProvider = ({ children }) => {
   const [state, dispatch] = useReducer(authReducer, initialState);
 
   useEffect(() => {
-    // Check for existing token on app start
-    const token = localStorage.getItem('authToken');
-    const userStr = localStorage.getItem('user');
-    
-    if (token && userStr && userStr !== 'undefined') {
+    const bootstrap = async () => {
+      const token = localStorage.getItem('authToken');
+      const userStr = localStorage.getItem('user');
+
+      if (!token || !userStr || userStr === 'undefined') {
+        return; // not logged in
+      }
+
       try {
         const user = JSON.parse(userStr);
-        dispatch({
-          type: 'LOGIN_SUCCESS',
-          payload: {
-            token,
-            user
-          }
-        });
+        // Optimistically set state for immediate UI, then validate
+        dispatch({ type: 'LOGIN_SUCCESS', payload: { token, user } });
+
+        // Validate token with backend; if invalid, clear and force logout
+        await authService.validateToken();
+
+        // Ensure we have fresh customer profile; if APPROVED, keep it and skip onboarding later
+        if (user.role === 'CUSTOMER') {
+          try {
+            const customers = await authService.getCustomerByUserId(user.id);
+            const data = Array.isArray(customers) ? customers[0] : customers;
+            if (data) {
+              updateUser({ customerId: data.id, kycStatus: data.kycStatus });
+            }
+          } catch (_) { /* ignore */ }
+        }
       } catch (error) {
-        // Invalid JSON in localStorage, clear it
-        console.error('Invalid user data in localStorage:', error);
         localStorage.removeItem('authToken');
         localStorage.removeItem('user');
+        dispatch({ type: 'LOGOUT' });
       }
-    }
+    };
+    bootstrap();
   }, []);
 
   const login = async (credentials) => {
@@ -74,14 +86,40 @@ export const AuthProvider = ({ children }) => {
       
       // Backend returns: { accessToken, id, username, email, role, ... }
       const token = response.accessToken || response.token;
+      const userId = response.id || response.userId;
+      
+      // Store token for API calls
+      localStorage.setItem('authToken', token);
+      
+      // Fetch customer profile to get KYC status (for CUSTOMER role only)
+      let customerData = null;
+      let kycStatus = 'APPROVED'; // Default for ADMIN
+
+      if (response.role === 'CUSTOMER') {
+        try {
+          // Get customer by userId (API returns a single object)
+          const customerResp = await authService.getCustomerByUserId(userId);
+          if (customerResp) {
+            customerData = customerResp;
+            kycStatus = customerResp.kycStatus || 'PENDING';
+          } else {
+            kycStatus = null; // no profile -> onboarding
+          }
+        } catch (err) {
+          console.warn('Could not fetch customer data:', err);
+          kycStatus = null; // ensure onboarding
+        }
+      }
+      
       const user = {
-        id: response.id || response.userId,
+        id: userId,
         username: response.username,
         email: response.email,
-        role: response.role
+        role: response.role,
+        customerId: customerData?.id,
+        kycStatus: kycStatus
       };
       
-      localStorage.setItem('authToken', token);
       localStorage.setItem('user', JSON.stringify(user));
       
       dispatch({
@@ -90,7 +128,7 @@ export const AuthProvider = ({ children }) => {
       });
       
       toast.success('Login successful!');
-      return { success: true };
+      return { success: true, user };
     } catch (error) {
       const errorMessage = error.response?.data?.message || 'Login failed';
       dispatch({
@@ -105,36 +143,28 @@ export const AuthProvider = ({ children }) => {
   const register = async (userData) => {
     dispatch({ type: 'LOGIN_START' });
     try {
-      console.log('📤 Sending registration request:', userData);
       const response = await authService.register(userData);
-      console.log('✅ Registration response:', response);
-      
-      // Backend returns: { accessToken, id, username, email, role, ... }
       const token = response.accessToken || response.token;
+      const userId = response.id || response.userId;
+
+      // Persist token and a minimal user; onboarding will complete profile
+      localStorage.setItem('authToken', token);
       const user = {
-        id: response.id || response.userId,
+        id: userId,
         username: response.username,
         email: response.email,
-        role: response.role
+        role: response.role,
+        customerId: null,
+        kycStatus: null
       };
-      
-      console.log('👤 User object created:', user);
-      
-      localStorage.setItem('authToken', token);
       localStorage.setItem('user', JSON.stringify(user));
-      
-      dispatch({
-        type: 'LOGIN_SUCCESS',
-        payload: { token, user }
-      });
-      
-      toast.success('Registration successful!');
-      return { success: true };
+
+      dispatch({ type: 'LOGIN_SUCCESS', payload: { token, user } });
+      toast.success('Registration successful! Please complete onboarding.');
+
+      // Caller will route to onboarding/profile
+      return { success: true, user };
     } catch (error) {
-      console.error('❌ Registration error:', error);
-      console.error('Error response:', error.response);
-      console.error('Error message:', error.message);
-      
       const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
       dispatch({
         type: 'LOGIN_ERROR',
@@ -163,6 +193,25 @@ export const AuthProvider = ({ children }) => {
     localStorage.setItem('user', JSON.stringify(updatedUser));
     dispatch({ type: 'UPDATE_USER', payload: userData });
   };
+
+  // Keep customer profile fresh in local storage after signin/reload
+  useEffect(() => {
+    const syncCustomer = async () => {
+      if (!state.isAuthenticated || state.user?.role !== 'CUSTOMER') return;
+      try {
+        const userId = state.user?.id;
+        if (!userId) return;
+        const resp = await authService.getCustomerByUserId(userId);
+        const data = Array.isArray(resp) ? resp[0] : resp;
+        if (data && (state.user?.customerId !== data.id || state.user?.kycStatus !== data.kycStatus)) {
+          updateUser({ customerId: data.id, kycStatus: data.kycStatus });
+        }
+      } catch (_) {
+        // ignore fetch errors; onboarding flow will handle absence
+      }
+    };
+    syncCustomer();
+  }, [state.isAuthenticated, state.user?.role]);
 
   const value = {
     ...state,
