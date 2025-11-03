@@ -8,6 +8,11 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const isAuthPage = location.pathname === '/login' || location.pathname === '/register';
+  const isLanding = location.pathname === '/';
+  const isOnboarding = location.pathname.startsWith('/onboarding');
+  const isKycPending = location.pathname === '/kyc-pending';
+  const isMfaSetup = location.pathname === '/mfa-setup';
+  const hideNavItems = isAuthPage || isOnboarding || isKycPending || isMfaSetup;
 
   const handleLogout = async () => {
     await logout();
@@ -17,63 +22,72 @@ const Navbar = () => {
   const brandTo = isAuthPage ? '/login' : (user?.role === 'ADMIN' ? '/admin' : '/dashboard');
 
   return (
-    <BSNavbar bg="dark" variant="dark" expand="lg" className="mb-4">
+    <BSNavbar expand="lg" fixed="top" className="mb-0">
       <Container>
         <BSNavbar.Brand as={Link} to={brandTo}>
           <i className="bi bi-bank me-2"></i>
-          Banking Portal
+          Riser ONE
         </BSNavbar.Brand>
-        {!isAuthPage && (<>
+        {!hideNavItems && (<>
         <BSNavbar.Toggle aria-controls="basic-navbar-nav" />
         <BSNavbar.Collapse id="basic-navbar-nav">
-          <Nav className="me-auto">
-            <Nav.Link as={Link} to={user?.role === 'ADMIN' ? '/admin' : '/dashboard'}>
-              <i className="bi bi-speedometer2 me-1"></i>
-              Dashboard
-            </Nav.Link>
-            {user?.role !== 'ADMIN' && (
-              <>
-                <Nav.Link as={Link} to="/accounts">
-                  <i className="bi bi-wallet2 me-1"></i>
-                  Accounts
-                </Nav.Link>
-                <Nav.Link as={Link} to="/transfer">
-                  <i className="bi bi-arrow-left-right me-1"></i>
-                  Transfer
-                </Nav.Link>
-                <Nav.Link as={Link} to="/payments">
-                  <i className="bi bi-receipt me-1"></i>
-                  Payments
-                </Nav.Link>
-                <Nav.Link as={Link} to="/credit">
-                  <i className="bi bi-credit-card me-1"></i>
-                  Credit
-                </Nav.Link>
-              </>
-            )}
-          </Nav>
-          <Nav>
-            <NavDropdown 
-              title={
+          {!(isLanding && !user) && (
+            <Nav className="me-auto">
+              <Nav.Link as={Link} to={user?.role === 'ADMIN' ? '/admin' : '/dashboard'}>
+                <i className="bi bi-speedometer2 me-1"></i>
+                Dashboard
+              </Nav.Link>
+              {user?.role !== 'ADMIN' && (
                 <>
-                  <i className="bi bi-person-circle me-1"></i>
-                  {user?.username || 'User'}
+                  <Nav.Link as={Link} to="/accounts">
+                    <i className="bi bi-wallet2 me-1"></i>
+                    Accounts
+                  </Nav.Link>
+                  <Nav.Link as={Link} to="/payments">
+                    <i className="bi bi-arrow-left-right me-1"></i>
+                    Payments
+                  </Nav.Link>
+                  <Nav.Link as={Link} to="/transactions">
+                    <i className="bi bi-receipt me-1"></i>
+                    Transactions
+                  </Nav.Link>
+                  <Nav.Link as={Link} to="/credit">
+                    <i className="bi bi-credit-card me-1"></i>
+                    Credit
+                  </Nav.Link>
                 </>
-              } 
-              id="user-nav-dropdown"
-              align="end"
-            >
-              <NavDropdown.Item as={Link} to="/profile">
-                <i className="bi bi-person me-2"></i>
-                Profile
-              </NavDropdown.Item>
-              <NavDropdown.Divider />
-              <NavDropdown.Item onClick={handleLogout}>
-                <i className="bi bi-box-arrow-right me-2"></i>
-                Logout
-              </NavDropdown.Item>
-            </NavDropdown>
-          </Nav>
+              )}
+            </Nav>
+          )}
+          {user ? (
+            <Nav>
+              <NavDropdown 
+                title={
+                  <>
+                    <i className="bi bi-person-circle me-1"></i>
+                    {user?.username || 'User'}
+                  </>
+                } 
+                id="user-nav-dropdown"
+                align="end"
+              >
+                <NavDropdown.Item as={Link} to="/profile">
+                  <i className="bi bi-person me-2"></i>
+                  Profile
+                </NavDropdown.Item>
+                <NavDropdown.Divider />
+                <NavDropdown.Item onClick={handleLogout}>
+                  <i className="bi bi-box-arrow-right me-2"></i>
+                  Logout
+                </NavDropdown.Item>
+              </NavDropdown>
+            </Nav>
+          ) : (
+            <Nav className="ms-auto">
+              <Link to="/login" className="btn btn-sm btn-primary me-2 hover-grow">Login</Link>
+              <Link to="/register" className="btn btn-sm btn-outline-secondary hover-grow">Register</Link>
+            </Nav>
+          )}
         </BSNavbar.Collapse>
         </>)}
       </Container>

@@ -69,9 +69,21 @@ export const authService = {
     return response.data;
   },
 
-  // Get customer by user ID
-  getCustomerByUserId: async (userId) => {
-    const response = await api.get(`/customers/user/${userId}`);
+  // Get customer by userId with fallback to email search
+  getCustomerByUserId: async (userId, email) => {
+    try {
+      const response = await api.get(`/customers/user/${userId}`);
+      return response.data;
+    } catch (err) {
+      if (!email) throw err;
+      const resp = await api.get('/customers/search', { params: { email } });
+      return Array.isArray(resp.data) ? resp.data[0] : resp.data;
+    }
+  },
+
+  // Update customer profile
+  updateCustomer: async (customerId, data) => {
+    const response = await api.put(`/customers/${customerId}`, data);
     return response.data;
   },
 };

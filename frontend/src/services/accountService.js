@@ -1,9 +1,9 @@
 import api from './api';
 
 export const accountService = {
-  // Get all customer accounts
-  getCustomerAccounts: async () => {
-    const response = await api.get('/accounts');
+  // Get accounts for current user
+  getCustomerAccounts: async (userId) => {
+    const response = await api.get(`/accounts/user/${userId}`);
     return response.data;
   },
 
@@ -38,8 +38,9 @@ export const accountService = {
   },
 
   // Get accounts by user ID
-  getAccountsByUserId: async (userId) => {
-    const response = await api.get(`/accounts/user/${userId}`);
+  getAccountsByUserId: async (userId, status = null) => {
+    const params = status ? { status } : {};
+    const response = await api.get(`/accounts/user/${userId}`, { params });
     return response.data;
   },
 

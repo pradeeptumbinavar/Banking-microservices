@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
         // Ensure we have fresh customer profile; if APPROVED, keep it and skip onboarding later
         if (user.role === 'CUSTOMER') {
           try {
-            const customers = await authService.getCustomerByUserId(user.id);
+            const customers = await authService.getCustomerByUserId(user.id, user.email);
             const data = Array.isArray(customers) ? customers[0] : customers;
             if (data) {
               updateUser({ customerId: data.id, kycStatus: data.kycStatus });
@@ -98,7 +98,7 @@ export const AuthProvider = ({ children }) => {
       if (response.role === 'CUSTOMER') {
         try {
           // Get customer by userId (API returns a single object)
-          const customerResp = await authService.getCustomerByUserId(userId);
+          const customerResp = await authService.getCustomerByUserId(userId, response.email);
           if (customerResp) {
             customerData = customerResp;
             kycStatus = customerResp.kycStatus || 'PENDING';
@@ -159,11 +159,15 @@ export const AuthProvider = ({ children }) => {
       };
       localStorage.setItem('user', JSON.stringify(user));
 
-      dispatch({ type: 'LOGIN_SUCCESS', payload: { token, user } });
-      toast.success('Registration successful! Please complete onboarding.');
+      if (token) {
+        dispatch({ type: 'LOGIN_SUCCESS', payload: { token, user } });
+      } else {
+        dispatch({ type: 'LOGIN_START' });
+      }
+      toast.success('Registration successful!');
 
-      // Caller will route to onboarding/profile
-      return { success: true, user };
+      // Return full response so caller can handle MFA QR code when present
+      return { success: true, user, ...response };
     } catch (error) {
       const errorMessage = error.response?.data?.message || error.message || 'Registration failed';
       dispatch({
@@ -201,7 +205,7 @@ export const AuthProvider = ({ children }) => {
       try {
         const userId = state.user?.id;
         if (!userId) return;
-        const resp = await authService.getCustomerByUserId(userId);
+        const resp = await authService.getCustomerByUserId(userId, state.user?.email);
         const data = Array.isArray(resp) ? resp[0] : resp;
         if (data && (state.user?.customerId !== data.id || state.user?.kycStatus !== data.kycStatus)) {
           updateUser({ customerId: data.id, kycStatus: data.kycStatus });

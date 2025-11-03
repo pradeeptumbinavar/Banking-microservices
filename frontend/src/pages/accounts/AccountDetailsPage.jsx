@@ -5,13 +5,11 @@ import { accountService } from '../../services/accountService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { toast } from 'react-toastify';
 import { formatCurrencyAmount } from '../../utils/currency';
-import { paymentService } from '../../services/paymentService';
 
 const AccountDetailsPage = () => {
   const { id } = useParams();
   const [account, setAccount] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [crediting, setCrediting] = useState(false);
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -50,32 +48,6 @@ const AccountDetailsPage = () => {
     : account.status === 'PENDING' ? 'warning'
     : account.status === 'SUSPENDED' ? 'danger'
     : 'secondary';
-
-  const handleCreditInitial = async () => {
-    try {
-      setCrediting(true);
-      // Self-transfer shim: from account to same account to record payment entry
-      await paymentService.createTransfer({
-        fromAccountId: account.id,
-        toAccountId: account.id,
-        amount: 50000,
-        currency: account.currency,
-        description: 'Initial credit on activation'
-      });
-      // Use accounts PUT to add money on self-credit as requested
-      try {
-        await accountService.updateAccount(account.id, { balanceDelta: 50000 });
-      } catch (_) { /* ignore if backend doesn't support balanceDelta */ }
-      toast.success('₹50,000 credited');
-      // Refresh account details to reflect any backend-side balance updates
-      const refreshed = await accountService.getAccountById(id);
-      setAccount(refreshed);
-    } catch (e) {
-      toast.error(e.response?.data?.message || 'Credit failed');
-    } finally {
-      setCrediting(false);
-    }
-  };
 
   return (
     <Container className="py-4">
@@ -118,14 +90,6 @@ const AccountDetailsPage = () => {
               <div className="fw-semibold">{account.updatedAt ? new Date(account.updatedAt).toLocaleString() : '-'}</div>
             </Col>
           </Row>
-
-          {account.status === 'ACTIVE' && Number(account.balance || 0) < 50000 && (
-            <div className="mb-3">
-              <Button variant="primary" onClick={handleCreditInitial} disabled={crediting}>
-                {crediting ? 'Crediting...' : 'Credit Initial 50,000'}
-              </Button>
-            </div>
-          )}
 
           <Row className="text-muted">
             <Col md={3} className="mb-2">

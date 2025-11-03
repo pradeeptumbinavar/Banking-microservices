@@ -30,12 +30,12 @@ const CreditProductsPage = () => {
 
   return (
     <Container className="py-4">
-      <h2 className="mb-4">Credit Products</h2>
+      <h2 className="mb-4" style={{ color: 'var(--text)' }}>Credit Products</h2>
       <Row className="g-4 mb-4">
         <Col md={6}>
-          <Card>
+          <Card className="glass-nav border-0">
             <Card.Body>
-              <h4>Personal Loan</h4>
+              <h4 style={{ color: 'var(--text)' }}>Personal Loan</h4>
               <p className="text-muted">Apply for a personal loan</p>
               <Button as={Link} to="/credit/loan/apply" variant="primary">
                 Apply Now
@@ -44,19 +44,21 @@ const CreditProductsPage = () => {
           </Card>
         </Col>
         <Col md={6}>
-          <Card>
+          <Card className="glass-nav border-0">
             <Card.Body>
-              <h4>Credit Card</h4>
-              <p className="text-muted">Get a credit card</p>
-              <Button variant="outline-primary">Coming Soon</Button>
+              <h4 style={{ color: 'var(--text)' }}>Credit Card</h4>
+              <p className="text-muted">Explore our credit card lineup</p>
+              <Button as={Link} to="/credit/cards" variant="primary">
+                Apply Now
+              </Button>
             </Card.Body>
           </Card>
         </Col>
       </Row>
 
-      <Card>
-        <Card.Header>
-          <h5 className="mb-0">Your Loans</h5>
+      <Card className="glass-nav border-0">
+        <Card.Header className="bg-transparent border-0">
+          <h5 className="mb-0" style={{ color: 'var(--text)' }}>Your Loans</h5>
         </Card.Header>
         <Card.Body>
           {loading ? (

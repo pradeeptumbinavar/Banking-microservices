@@ -8,7 +8,12 @@ import { AuthProvider } from './context/AuthContext';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap-icons/font/bootstrap-icons.css';
 import 'react-toastify/dist/ReactToastify.css';
+import './styles/tokens.css';
 import './styles/globals.css';
+
+if (!document.documentElement.dataset.theme) {
+  document.documentElement.dataset.theme = 'noir';
+}
 
 const queryClient = new QueryClient({
   defaultOptions: {

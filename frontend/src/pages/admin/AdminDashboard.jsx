@@ -182,7 +182,7 @@ const AdminDashboard = () => {
   return (
     <Container className="py-4">
       <h2 className="mb-4">Admin Approvals</h2>
-      <Card className="p-3">
+      <Card className="glass-nav border-0 p-3">
         <Tabs activeKey={active} onSelect={onSelectTab} className="mb-3">
           <Tab eventKey="KYC" title="KYC" />
           <Tab eventKey="Accounts" title="Accounts" />

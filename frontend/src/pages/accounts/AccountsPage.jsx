@@ -14,6 +14,7 @@ const AccountsPage = () => {
 
   useEffect(() => {
     const fetchAccounts = async () => {
+      setLoading(true);
       try {
         const lookupId = user?.customerId || user?.id;
         if (!lookupId) {
@@ -21,7 +22,7 @@ const AccountsPage = () => {
           return;
         }
         const data = await accountService.getAccountsByUserId(lookupId);
-        setAccounts(data);
+        setAccounts(Array.isArray(data) ? data : []);
       } catch (error) {
         const msg = error.response?.data?.message || error.message || 'Failed to fetch accounts';
         toast.error(msg);
@@ -42,7 +43,7 @@ const AccountsPage = () => {
       <Row className="mb-4">
         <Col>
           <div className="d-flex justify-content-between align-items-center">
-            <h2>
+            <h2 style={{ color: 'var(--text)' }}>
               <i className="bi bi-wallet2 me-2"></i>
               My Accounts
             </h2>
@@ -55,10 +56,10 @@ const AccountsPage = () => {
       </Row>
 
       {accounts.length === 0 ? (
-        <Card className="text-center py-5">
+        <Card className="glass-nav border-0 text-center py-5">
           <Card.Body>
             <i className="bi bi-wallet display-1 text-muted"></i>
-            <h4 className="mt-3">No Accounts Yet</h4>
+            <h4 className="mt-3" style={{ color: 'var(--text)' }}>No Accounts Yet</h4>
             <p className="text-muted">Get started by opening your first account</p>
             <Button as={Link} to="/accounts/create" variant="primary">
               Open Account
@@ -69,11 +70,11 @@ const AccountsPage = () => {
         <Row className="g-4">
           {accounts.map((account) => (
             <Col key={account.id} md={6} lg={4}>
-              <Card className="h-100 shadow-sm">
+              <Card className="glass-nav border-0 h-100 shadow-sm">
                 <Card.Body>
                   <div className="d-flex justify-content-between align-items-start mb-3">
                     <div>
-                      <h5 className="mb-1">{account.accountType}</h5>
+                      <h5 className="mb-1" style={{ color: 'var(--text)' }}>{account.accountType}</h5>
                       <small className="text-muted">{account.accountNumber}</small>
                     </div>
                     <span className={`badge bg-${account.status === 'ACTIVE' ? 'success' : 'warning'}`}>
@@ -102,4 +103,3 @@ const AccountsPage = () => {
 };
 
 export default AccountsPage;
-

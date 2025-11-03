@@ -54,5 +54,11 @@ export const customerService = {
     const response = await api.post('/customers/approvals/bulk', data);
     return response.data;
   },
+
+  // Fetch all customers with KYC ACTIVE (APPROVED)
+  getKycActiveCustomers: async () => {
+    const response = await api.get('/customers/kyc/active');
+    return response.data;
+  },
 };
 

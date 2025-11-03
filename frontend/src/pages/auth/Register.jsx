@@ -9,7 +9,8 @@ const Register = () => {
     email: '',
     password: '',
     confirmPassword: '',
-    role: 'CUSTOMER'
+    role: 'CUSTOMER',
+    mfaEnabled: false
   });
   const [validationError, setValidationError] = useState('');
   const { register, loading, error } = useAuth();
@@ -32,7 +33,11 @@ const Register = () => {
     try {
       const { confirmPassword, ...registerData } = formData;
       const result = await register(registerData);
-      // New flow: after signup, go to onboarding profile
+      // If MFA was requested and QR provided, route to setup page first
+      if (result?.mfaQrCode) {
+        navigate('/mfa-setup', { state: { mfaQrCode: result.mfaQrCode } });
+        return;
+      }
       if (result?.success) {
         navigate('/onboarding/profile');
       }
@@ -49,34 +54,22 @@ const Register = () => {
   };
 
   return (
-    <div className="register-page" style={{ 
-      background: 'var(--background-gradient)',
+    <div className="register-page with-bg auth-shell" style={{ 
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '3rem 2rem'
     }}>
-      <div style={{ width: '100%', maxWidth: '55vw', minWidth: '650px' }}>
-        <div className="text-center mb-5">
-          <div className="mb-4">
-            <i className="bi bi-person-plus-fill text-white" style={{ fontSize: '5rem' }}></i>
-          </div>
-          <h1 className="text-white fw-bold mb-2" style={{ fontSize: '2.75rem', letterSpacing: '-0.02em' }}>
-            Join Banking Portal
-          </h1>
-          <p className="text-white opacity-75" style={{ fontSize: '1.25rem' }}>
-            Create your account in minutes
-          </p>
-        </div>
+      <div style={{ width: '100%', maxWidth: '640px', marginTop: '0.5rem' }}>
 
-        <Card className="border-0" style={{ borderRadius: '1.5rem' }}>
-          <Card.Body style={{ padding: '3.5rem 4rem' }}>
+        <Card className="glass-nav border-0" style={{ borderRadius: '1.5rem' }}>
+          <Card.Body style={{ padding: '2.75rem 3rem', color: 'var(--text)' }}>
             <div className="mb-5">
-              <h2 className="fw-bold mb-3" style={{ fontSize: '2rem', color: 'var(--gray-900)', letterSpacing: '-0.02em' }}>
+              <h2 className="fw-bold mb-3" style={{ fontSize: '2rem', color: 'var(--text)', letterSpacing: '-0.02em' }}>
                 Create Account
               </h2>
-              <p className="text-muted mb-0" style={{ fontSize: '1.125rem', lineHeight: '1.6' }}>
+              <p className="mb-0" style={{ fontSize: '1.05rem', lineHeight: '1.6', color: 'var(--text)', opacity: 0.85 }}>
                 Fill in your details to get started
               </p>
             </div>
@@ -91,8 +84,8 @@ const Register = () => {
             <Form onSubmit={handleSubmit}>
               <Row className="g-4">
                 <Col md={6}>
-                  <Form.Group className="mb-4" controlId="username">
-                    <Form.Label className="fw-semibold mb-3" style={{ fontSize: '1rem', color: 'var(--gray-700)' }}>
+                  <Form.Group className="mb-3" controlId="username">
+                    <Form.Label className="fw-semibold mb-3" style={{ fontSize: '1rem', color: 'var(--muted)' }}>
                       Username
                     </Form.Label>
                     <Form.Control
@@ -103,19 +96,13 @@ const Register = () => {
                       onChange={handleChange}
                       required
                       autoComplete="username"
-                      style={{ 
-                        padding: '1.125rem 1.5rem',
-                        fontSize: '1.0625rem',
-                        borderRadius: '0.75rem',
-                        border: '2px solid var(--gray-200)',
-                        transition: 'all 0.2s'
-                      }}
+                      style={{ padding: '0.875rem 1rem', fontSize: '1.05rem', backgroundColor: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'var(--text)' }}
                     />
                   </Form.Group>
                 </Col>
                 <Col md={6}>
-                  <Form.Group className="mb-4" controlId="email">
-                    <Form.Label className="fw-semibold mb-3" style={{ fontSize: '1rem', color: 'var(--gray-700)' }}>
+                  <Form.Group className="mb-3" controlId="email">
+                    <Form.Label className="fw-semibold mb-3" style={{ fontSize: '1rem', color: 'var(--muted)' }}>
                       Email
                     </Form.Label>
                     <Form.Control
@@ -126,13 +113,7 @@ const Register = () => {
                       onChange={handleChange}
                       required
                       autoComplete="email"
-                      style={{ 
-                        padding: '1.125rem 1.5rem',
-                        fontSize: '1.0625rem',
-                        borderRadius: '0.75rem',
-                        border: '2px solid var(--gray-200)',
-                        transition: 'all 0.2s'
-                      }}
+                      style={{ padding: '0.875rem 1rem', fontSize: '1.05rem', backgroundColor: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'var(--text)' }}
                     />
                   </Form.Group>
                 </Col>
@@ -140,8 +121,8 @@ const Register = () => {
 
               <Row className="g-4">
                 <Col md={6}>
-                  <Form.Group className="mb-4" controlId="password">
-                    <Form.Label className="fw-semibold mb-3" style={{ fontSize: '1rem', color: 'var(--gray-700)' }}>
+                  <Form.Group className="mb-3" controlId="password">
+                    <Form.Label className="fw-semibold mb-3" style={{ fontSize: '1rem', color: 'var(--muted)' }}>
                       Password
                     </Form.Label>
                     <Form.Control
@@ -152,13 +133,7 @@ const Register = () => {
                       onChange={handleChange}
                       required
                       autoComplete="new-password"
-                      style={{ 
-                        padding: '1.125rem 1.5rem',
-                        fontSize: '1.0625rem',
-                        borderRadius: '0.75rem',
-                        border: '2px solid var(--gray-200)',
-                        transition: 'all 0.2s'
-                      }}
+                      style={{ padding: '0.875rem 1rem', fontSize: '1.05rem', backgroundColor: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'var(--text)' }}
                     />
                     <Form.Text className="text-muted" style={{ fontSize: '0.9375rem' }}>
                       At least 6 characters
@@ -166,8 +141,8 @@ const Register = () => {
                   </Form.Group>
                 </Col>
                 <Col md={6}>
-                  <Form.Group className="mb-4" controlId="confirmPassword">
-                    <Form.Label className="fw-semibold mb-3" style={{ fontSize: '1rem', color: 'var(--gray-700)' }}>
+                  <Form.Group className="mb-3" controlId="confirmPassword">
+                    <Form.Label className="fw-semibold mb-3" style={{ fontSize: '1rem', color: 'var(--muted)' }}>
                       Confirm Password
                     </Form.Label>
                     <Form.Control
@@ -178,36 +153,30 @@ const Register = () => {
                       onChange={handleChange}
                       required
                       autoComplete="new-password"
-                      style={{ 
-                        padding: '1.125rem 1.5rem',
-                        fontSize: '1.0625rem',
-                        borderRadius: '0.75rem',
-                        border: '2px solid var(--gray-200)',
-                        transition: 'all 0.2s'
-                      }}
+                      style={{ padding: '0.875rem 1rem', fontSize: '1.05rem', backgroundColor: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'var(--text)' }}
                     />
                   </Form.Group>
                 </Col>
               </Row>
 
+              {/* MFA opt-in */}
+              <div className="form-check mb-4">
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id="mfaEnabled"
+                  checked={formData.mfaEnabled}
+                  onChange={(e) => setFormData({ ...formData, mfaEnabled: e.target.checked })}
+                />
+                <label className="form-check-label" htmlFor="mfaEnabled" style={{ color: 'var(--text)' }}>
+                  Enable two-factor authentication (Authenticator app)
+                </label>
+              </div>
+
               {/* Role is automatically set to CUSTOMER - Admin accounts are created manually */}
 
-              <div className="mt-5 pt-2">
-                <Button 
-                  variant="primary" 
-                  type="submit" 
-                  className="w-100 fw-semibold"
-                  disabled={loading}
-                  style={{
-                    padding: '1.125rem 2rem',
-                    fontSize: '1.125rem',
-                    borderRadius: '0.75rem',
-                    background: 'var(--primary-color)',
-                    border: 'none',
-                    letterSpacing: '0.015em',
-                    transition: 'all 0.2s'
-                  }}
-                >
+              <div className="mt-4 pt-1">
+                <Button variant="primary" type="submit" className="w-100 fw-semibold hover-grow" disabled={loading} style={{ padding: '1rem 1.75rem', fontSize: '1.0625rem', borderRadius: '0.75rem' }}>
                   {loading ? (
                     <>
                       <span className="spinner-border spinner-border-sm me-2" />
@@ -223,11 +192,7 @@ const Register = () => {
             <div className="mt-5 pt-5 text-center" style={{ borderTop: '1px solid var(--gray-200)' }}>
               <p className="text-muted mb-0" style={{ fontSize: '1.0625rem' }}>
                 Already have an account?{' '}
-                <Link 
-                  to="/login" 
-                  className="fw-semibold text-decoration-none"
-                  style={{ color: 'var(--primary-color)', fontSize: '1.0625rem' }}
-                >
+                <Link to="/login" className="fw-semibold text-decoration-none" style={{ color: 'var(--primary)', fontSize: '1.0625rem' }}>
                   Sign in instead →
                 </Link>
               </p>

@@ -40,20 +40,23 @@ const TransferPage = () => {
     setLoading(true);
 
     try {
-      const from = accounts.find(a => a.id === parseInt(formData.fromAccountId));
+      const amount = parseFloat(formData.amount);
+      // Get current account balances
+      const from = await accountService.getAccountById(parseInt(formData.fromAccountId));
+      const to = await accountService.getAccountById(parseInt(formData.toAccountId));
+      
+      // Update balances via PUT
+      await accountService.updateAccount(parseInt(formData.fromAccountId), { balance: (parseFloat(from.balance) || 0) - amount });
+      await accountService.updateAccount(parseInt(formData.toAccountId), { balance: (parseFloat(to.balance) || 0) + amount });
+      
+      // Record transaction
       await paymentService.createTransfer({
         ...formData,
         fromAccountId: parseInt(formData.fromAccountId),
         toAccountId: parseInt(formData.toAccountId),
-        amount: parseFloat(formData.amount),
+        amount,
         currency: from?.currency || 'USD'
       });
-      // Apply account balance changes via accounts PUT as requested
-      const amount = parseFloat(formData.amount);
-      try {
-        await accountService.updateAccount(parseInt(formData.fromAccountId), { balanceDelta: -amount });
-        await accountService.updateAccount(parseInt(formData.toAccountId), { balanceDelta: amount });
-      } catch (_) { /* ignore if backend doesn't support it */ }
       toast.success('Transfer initiated successfully!');
       setFormData({ fromAccountId: '', toAccountId: '', amount: '', description: '' });
     } catch (error) {
@@ -67,9 +70,9 @@ const TransferPage = () => {
     <Container className="py-4">
       <Row className="justify-content-center">
         <Col md={8} lg={6}>
-          <Card>
-            <Card.Header>
-              <h4 className="mb-0">
+          <Card className="glass-nav border-0">
+            <Card.Header className="bg-transparent border-0">
+              <h4 className="mb-0" style={{ color: 'var(--text)' }}>
                 <i className="bi bi-arrow-left-right me-2"></i>
                 Transfer Money
               </h4>

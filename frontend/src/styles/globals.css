@@ -62,10 +62,14 @@
   box-sizing: border-box;
 }
 
+html, body, #root {
+  height: 100%;
+}
+
 body {
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  background-color: var(--background-color);
-  color: var(--gray-900);
+  font-family: "Manrope", Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  background: var(--bg);
+  color: var(--text);
   line-height: 1.75;
   font-size: 16px;
   -webkit-font-smoothing: antialiased;
@@ -73,10 +77,38 @@ body {
   letter-spacing: -0.011em;
 }
 
+/* Global ambient background */
+.page-bg,
+.page-overlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+}
+
+.page-bg {
+  z-index: -2;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  transform: scale(1.02);
+  filter: saturate(1.08) brightness(0.92);
+}
+
+.page-overlay {
+  z-index: -1;
+  background:
+    radial-gradient(120% 140% at 20% 10%, rgba(98, 82, 214, 0.28), transparent 60%),
+    radial-gradient(115% 130% at 80% 5%, rgba(40, 181, 207, 0.14), transparent 55%),
+    linear-gradient(140deg, rgba(5, 9, 22, 0.96) 0%, rgba(16, 18, 38, 0.92) 42%, rgba(36, 18, 58, 0.88) 100%);
+}
+
 #root {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  position: relative;
+  z-index: 0;
 }
 
 /* Login & Register Pages - Minimal & Spacious */
@@ -160,11 +192,12 @@ body {
   background-color: #212529 !important;
 }
 
-/* Table Styles - Spacious */
+/* Table Styles - Dark Theme */
 .table {
-  background: white;
+  background: transparent !important;
   border-radius: var(--radius-lg);
   overflow: hidden;
+  color: var(--text) !important;
 }
 
 .table th {
@@ -172,15 +205,26 @@ body {
   text-transform: uppercase;
   font-size: 0.75rem;
   letter-spacing: 0.05em;
-  color: var(--gray-600);
+  color: var(--text) !important;
   padding: var(--spacing-lg);
-  background: var(--gray-50);
-  border-bottom: 2px solid var(--gray-200);
+  background: color-mix(in oklab, var(--surface) 40%, transparent) !important;
+  border-bottom: 2px solid var(--border) !important;
 }
 
 .table td {
   padding: var(--spacing-lg);
   vertical-align: middle;
+  color: var(--text) !important;
+  background: transparent !important;
+  border-bottom: 1px solid var(--border) !important;
+}
+
+.table tbody tr {
+  background: transparent !important;
+}
+
+.table tbody tr:hover {
+  background: color-mix(in oklab, var(--surface) 30%, transparent) !important;
 }
 
 /* Badge Styles - Modern */
@@ -203,11 +247,12 @@ body {
 .form-control,
 .form-select {
   border-radius: var(--radius-lg);
-  border: 2px solid var(--gray-200);
+  border: 2px solid var(--border) !important;
   padding: 0.875rem 1.125rem;
   font-size: 0.9375rem;
   transition: all var(--transition-base);
-  background: var(--lighter-color);
+  background: color-mix(in oklab, var(--surface) 60%, transparent) !important;
+  color: var(--text) !important;
 }
 
 .form-control:focus,
@@ -266,6 +311,13 @@ html {
   scroll-behavior: smooth;
 }
 
+/* Global fixed navbar offset */
+:root { --navbar-height: 72px; --content-offset: calc(var(--navbar-height) + 24px); }
+.content-offset { padding-top: var(--content-offset); }
+
+/* Improve scrollbar colors (Firefox + WebKit) */
+html { scrollbar-color: color-mix(in oklab, var(--primary) 75%, black) var(--surface); scrollbar-width: thin; }
+
 /* Toast Container Override */
 .Toastify__toast {
   border-radius: 8px;
@@ -278,15 +330,334 @@ html {
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--light-color);
+  background: var(--surface);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--primary-color);
+  background: var(--primary);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--secondary-color);
+  background: color-mix(in oklab, var(--primary) 85%, black);
 }
 
+/* Token-based overrides */
+.card, .modal-content, .offcanvas, .dropdown-menu {
+  background: color-mix(in oklab, var(--surface) 85%, transparent) !important;
+  border-radius: var(--radius) !important;
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Modal specific dark theme overrides */
+.modal-content {
+  background: color-mix(in oklab, var(--surface) 90%, transparent) !important;
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  color: var(--text) !important;
+}
+
+.modal-header {
+  border-bottom: 1px solid var(--border) !important;
+  color: var(--text) !important;
+}
+
+.modal-footer {
+  border-top: 1px solid var(--border) !important;
+}
+
+.modal-header .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Dropdown menu items */
+.dropdown-menu {
+  background: color-mix(in oklab, var(--surface) 85%, transparent) !important;
+  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+}
+
+.dropdown-item {
+  color: var(--text) !important;
+  background: transparent !important;
+}
+
+.dropdown-item:hover, .dropdown-item:focus {
+  background: color-mix(in oklab, var(--primary) 20%, transparent) !important;
+  color: var(--text) !important;
+}
+
+.dropdown-item.active, .dropdown-item:active {
+  background: color-mix(in oklab, var(--primary) 40%, transparent) !important;
+  color: var(--text) !important;
+}
+
+.btn-primary {
+  --bs-btn-bg: var(--primary);
+  --bs-btn-border-color: var(--primary);
+  --bs-btn-color: var(--primary-contrast);
+  --bs-btn-hover-bg: color-mix(in oklab, var(--primary) 85%, black);
+  --bs-btn-hover-border-color: color-mix(in oklab, var(--primary) 80%, black);
+  border-radius: calc(var(--radius) - 2px);
+  transition: transform var(--transition-fast);
+  background: var(--primary);
+  border-color: var(--primary);
+}
+.btn-primary:hover { transform: translateY(-1px); }
+
+/* Stronger overrides to avoid legacy purple styles */
+.btn.btn-primary {
+  background: var(--primary) !important;
+  border-color: var(--primary) !important;
+  color: var(--primary-contrast) !important;
+}
+.btn.btn-primary:hover, .btn.btn-primary:focus {
+  background: color-mix(in oklab, var(--primary) 90%, black) !important;
+  border-color: color-mix(in oklab, var(--primary) 85%, black) !important;
+}
+
+/* Outline secondary aligned to palette */
+.btn.btn-outline-secondary {
+  color: var(--muted) !important;
+  border-color: color-mix(in oklab, var(--muted) 60%, var(--border)) !important;
+  background: transparent !important;
+}
+.btn.btn-outline-secondary:hover, .btn.btn-outline-secondary:focus {
+  color: var(--primary-contrast) !important;
+  background: color-mix(in oklab, var(--primary) 30%, transparent) !important;
+  border-color: var(--primary) !important;
+}
+
+.navbar {
+  background: color-mix(in oklab, var(--surface) 55%, transparent);
+  backdrop-filter: saturate(140%) blur(14px);
+  border-bottom: 1px solid var(--border);
+  z-index: 1030;
+  margin: 0 !important; /* ensure no UA/override margins */
+}
+
+.navbar .navbar-brand, .navbar .nav-link, .navbar .dropdown-item {
+  color: color-mix(in oklab, var(--text) 92%, transparent) !important;
+}
+.navbar .nav-link:hover, .navbar .dropdown-item:hover {
+  color: var(--text) !important;
+}
+
+/* Tabs - align with dark palette */
+.nav-tabs .nav-link {
+  color: color-mix(in oklab, var(--text) 80%, transparent);
+  background: color-mix(in oklab, var(--surface) 60%, transparent);
+  border-color: var(--border);
+}
+.nav-tabs .nav-link.active, .nav-tabs .nav-item.show .nav-link {
+  color: var(--primary) !important;
+  background: color-mix(in oklab, var(--surface) 85%, transparent);
+  border-color: var(--border);
+}
+.nav-tabs {
+  border-color: var(--border) !important;
+}
+
+.form-control, .form-select {
+  border-radius: var(--radius);
+  border: 1px solid var(--border) !important;
+  background: color-mix(in oklab, var(--surface) 60%, transparent) !important;
+  color: var(--text) !important;
+}
+
+.form-select option {
+  background: var(--surface) !important;
+  color: var(--text) !important;
+}
+
+/* Force dark dropdown arrow */
+.form-select:not([multiple]):not([size]) {
+  background-image: none !important;
+  padding-right: 1rem !important;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+/* Additional override for select dropdowns to ensure dark theme */
+select.form-select {
+  background-color: color-mix(in oklab, var(--surface) 60%, transparent) !important;
+  color: var(--text) !important;
+}
+
+/* For browsers that support styling option elements */
+select.form-select option {
+  background-color: var(--surface) !important;
+  color: var(--text) !important;
+  padding: 0.5rem;
+}
+
+/* Ensure table responsive wrapper doesn't add white background */
+.table-responsive {
+  background: transparent !important;
+}
+
+.form-control::placeholder, .form-select::placeholder {
+  color: color-mix(in oklab, var(--text) 65%, var(--muted));
+  opacity: 0.85;
+}
+
+.form-label { color: var(--muted); }
+
+a { color: var(--primary); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* hero */
+.hero {
+  background: radial-gradient(1200px 600px at 10% 10%, color-mix(in oklab, var(--primary) 22%, transparent), transparent),
+              radial-gradient(1200px 600px at 90% 0%, color-mix(in oklab, var(--accent-2) 18%, transparent), transparent);
+  margin-top: 0 !important; /* prevent collapsed margins under navbar */
+}
+
+.hero-card {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: clamp(2rem, 6vw, 4rem);
+  padding: clamp(2.25rem, 6vw, 4rem);
+  border-radius: var(--radius-2xl);
+  background: color-mix(in srgb, rgba(13, 16, 33, 0.92) 82%, transparent);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  box-shadow: 0 30px 60px rgba(7, 10, 25, 0.45);
+  backdrop-filter: blur(26px) saturate(140%);
+  -webkit-backdrop-filter: blur(26px) saturate(140%);
+  overflow: hidden;
+}
+
+.hero-card__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 1.5rem;
+}
+
+.hero-card__kicker {
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.75rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.hero-card__headline {
+  font-size: clamp(2.6rem, 5vw, 3.7rem);
+  letter-spacing: -0.025em;
+  line-height: 1.05;
+  color: #f5f7ff;
+}
+
+.hero-card__headline span:first-of-type {
+  color: color-mix(in oklab, var(--primary) 75%, white);
+}
+
+.hero-card__headline span:last-of-type {
+  color: color-mix(in oklab, var(--accent-2) 75%, white);
+}
+
+.hero-card__support {
+  color: rgba(232, 234, 255, 0.75) !important;
+  font-size: 1.05rem;
+  max-width: 28rem;
+}
+
+.hero-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.hero-card__visual {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.hero-card__visual::after {
+  content: "";
+  position: absolute;
+  inset: auto 10% -10% 10%;
+  height: 40%;
+  background: radial-gradient(circle at 50% 0%, rgba(124, 58, 237, 0.18), transparent 70%);
+  filter: blur(10px);
+}
+
+.hero-card__lottie {
+  width: clamp(320px, 48vw, 480px);
+  filter: drop-shadow(0 25px 45px rgba(10, 12, 32, 0.55));
+}
+
+.hero-card .btn-outline-light {
+  border-color: rgba(255, 255, 255, 0.35);
+  color: rgba(255, 255, 255, 0.92);
+}
+
+.hero-card .btn-outline-light:hover {
+  border-color: rgba(255, 255, 255, 0.55);
+  background-color: rgba(255, 255, 255, 0.12);
+  color: #fff;
+}
+
+.hero .text-muted { color: var(--muted) !important; opacity: 1; }
+
+@media (max-width: 992px) {
+  .hero-card {
+    grid-template-columns: 1fr;
+    text-align: center;
+    gap: 2.5rem;
+  }
+
+  .hero-card__content {
+    align-items: center;
+  }
+
+  .hero-card__support {
+    max-width: none;
+  }
+
+  .hero-card__actions {
+    justify-content: center;
+  }
+}
+
+/* Improve muted text readability globally */
+.text-muted {
+  color: color-mix(in oklab, var(--text) 88%, var(--muted)) !important;
+  opacity: 0.96;
+}
+
+/* Glass utility for translucent surfaces */
+.glass {
+  background: color-mix(in oklab, var(--surface) 55%, transparent) !important;
+  backdrop-filter: blur(16px) saturate(150%);
+  border: 1px solid var(--border) !important;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Navbar-like translucent glass for forms */
+.glass-nav {
+  background: color-mix(in oklab, var(--surface) 30%, transparent) !important;
+  backdrop-filter: blur(22px) saturate(160%);
+  -webkit-backdrop-filter: blur(22px) saturate(160%);
+  border: 1px solid color-mix(in oklab, var(--border) 65%, transparent) !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+/* Background helper gradient */
+.with-bg {
+  background:
+    radial-gradient(140% 100% at 15% 0%, rgba(116, 94, 255, 0.18), transparent 55%),
+    radial-gradient(160% 120% at 85% 0%, rgba(16, 185, 129, 0.1), transparent 52%),
+    linear-gradient(150deg, #0a0d1f 0%, #151b38 45%, #221a43 100%);
+}
+
+/* Consistent top spacing so content doesn't hide under sticky navbar */
+.auth-shell { padding-top: 0; padding-bottom: 3rem; }

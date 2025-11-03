@@ -14,8 +14,8 @@ const KYCPendingPage = () => {
 
   return (
     <div 
+      className="with-bg auth-shell"
       style={{ 
-        background: 'var(--background-gradient)',
         minHeight: '100vh',
         display: 'flex',
         alignItems: 'center',
@@ -24,7 +24,7 @@ const KYCPendingPage = () => {
       }}
     >
       <Container className="text-center" style={{ maxWidth: '600px' }}>
-        <Card className="border-0 shadow-lg" style={{ borderRadius: '1.5rem' }}>
+        <Card className="glass-nav border-0" style={{ borderRadius: '1.5rem' }}>
           <Card.Body className="p-5">
             <div className="mb-4">
               <i 
@@ -36,7 +36,7 @@ const KYCPendingPage = () => {
               ></i>
             </div>
             
-            <h2 className="fw-bold mb-3" style={{ color: 'var(--gray-900)' }}>
+            <h2 className="fw-bold mb-3" style={{ color: 'var(--text)' }}>
               KYC Approval Pending
             </h2>
             
@@ -61,18 +61,18 @@ const KYCPendingPage = () => {
             </div>
             
             <div className="mb-4">
-              <h5 className="fw-semibold mb-3">While you wait:</h5>
-              <ul className="list-unstyled text-start mx-auto" style={{ maxWidth: '400px' }}>
+              <h5 className="fw-semibold mb-3" style={{ color: 'var(--text)' }}>While you wait:</h5>
+              <ul className="list-unstyled text-start mx-auto" style={{ maxWidth: '400px', color: 'var(--text)' }}>
                 <li className="mb-2">
-                  <i className="bi bi-check-circle text-success me-2"></i>
+                  <i className="bi bi-check-circle me-2" style={{ color: 'var(--primary)' }}></i>
                   Your registration is complete
                 </li>
                 <li className="mb-2">
-                  <i className="bi bi-check-circle text-success me-2"></i>
+                  <i className="bi bi-check-circle me-2" style={{ color: 'var(--primary)' }}></i>
                   Your customer profile has been created
                 </li>
                 <li className="mb-2">
-                  <i className="bi bi-clock text-warning me-2"></i>
+                  <i className="bi bi-clock me-2" style={{ color: 'var(--primary)' }}></i>
                   KYC approval in progress
                 </li>
               </ul>

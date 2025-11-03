@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { accountService } from '../../services/accountService';
@@ -48,12 +49,75 @@ const CustomerDashboard = () => {
   const totalBalance = accounts.reduce((sum, acc) => sum + (acc.balance || 0), 0);
   const activeCount = accounts.filter(a => a.status === 'ACTIVE').length;
 
+  const statCardStyle = {
+    borderRadius: 'var(--radius-2xl)',
+    background: 'linear-gradient(145deg, rgba(13, 17, 38, 0.94) 0%, rgba(28, 22, 52, 0.88) 100%)',
+    border: '1px solid rgba(255, 255, 255, 0.08)',
+    boxShadow: '0 24px 50px rgba(7, 10, 25, 0.45)',
+    overflow: 'hidden'
+  };
+
+  const statLabelStyle = {
+    color: 'rgba(228, 231, 255, 0.7)',
+    fontSize: '0.75rem',
+    letterSpacing: '0.08em'
+  };
+
+  const statValueStyle = {
+    fontSize: '2rem',
+    color: '#f6f7ff'
+  };
+
+  const trendPositiveStyle = {
+    color: '#34d399'
+  };
+
+  const accountsShellStyle = {
+    borderRadius: 'var(--radius-2xl)',
+    background: 'linear-gradient(150deg, rgba(12, 16, 37, 0.92) 0%, rgba(22, 19, 46, 0.9) 100%)',
+    border: '1px solid rgba(255, 255, 255, 0.06)'
+  };
+
+  const accountItemStyle = {
+    background: 'rgba(20, 24, 46, 0.92)',
+    border: '1px solid rgba(255, 255, 255, 0.05)',
+    borderRadius: 'var(--radius-xl)',
+    transition: 'all var(--transition-base)',
+    color: '#f4f6ff'
+  };
+
+  const quickActionCardStyle = {
+    borderRadius: 'var(--radius-2xl)',
+    background: 'linear-gradient(160deg, rgba(16, 18, 45, 0.92) 0%, rgba(26, 20, 52, 0.88) 100%)',
+    border: '1px solid rgba(255, 255, 255, 0.06)'
+  };
+
+  const quickActionButtonStyle = {
+    padding: '1rem',
+    borderRadius: 'var(--radius-xl)',
+    border: '1px solid rgba(255, 255, 255, 0.05)',
+    background: 'rgba(18, 22, 48, 0.9)',
+    color: '#f6f7ff'
+  };
+
+  const quickActionSubtle = {
+    color: 'rgba(228, 231, 255, 0.7)'
+  };
+
   return (
-    <Container fluid className="dashboard-container" style={{ background: 'var(--background-color)', minHeight: '100vh' }}>
+    <Container fluid className="dashboard-container" style={{ minHeight: '100vh' }}>
       {/* Welcome Header */}
       <div className="mb-5">
-        <h1 className="fw-bold mb-2" style={{ fontSize: '2.25rem', color: 'var(--gray-900)' }}>
-          Welcome back, {user?.username}! 👋
+        <h1 className="fw-bold mb-2" style={{ fontSize: '2.25rem', color: 'var(--primary)' }}>
+          Welcome back, {user?.username}!{' '}
+          <span style={{ display: 'inline-block', width: 80, height: 80, verticalAlign: 'middle' }}>
+            <DotLottieReact
+              src="https://lottie.host/37d27ab1-eb7e-4594-a292-38af58df2e02/BqKK0ZGDz6.lottie"
+              loop
+              autoplay
+              style={{ width: '60px', height: '60px' }}
+            />
+          </span>
         </h1>
         <p className="text-muted mb-0" style={{ fontSize: '1.125rem' }}>
           Here's your financial overview for today
@@ -63,14 +127,14 @@ const CustomerDashboard = () => {
       {/* Stats Cards */}
       <Row className="g-4 mb-5">
         <Col lg={4} md={6}>
-          <Card className="border-0 h-100" style={{ borderRadius: 'var(--radius-2xl)', overflow: 'hidden' }}>
-            <Card.Body className="p-4">
+          <Card className="border-0 h-100" style={statCardStyle}>
+            <Card.Body className="p-4" style={{ color: '#f6f7ff' }}>
               <div className="d-flex justify-content-between align-items-start mb-3">
                 <div>
-                  <p className="text-muted mb-2 text-uppercase fw-semibold" style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}>
+                  <p className="text-muted mb-2 text-uppercase fw-semibold" style={statLabelStyle}>
                     Total Balance
                   </p>
-                  <h2 className="fw-bold mb-0" style={{ fontSize: '2rem', color: 'var(--gray-900)' }}>
+                  <h2 className="fw-bold mb-0" style={statValueStyle}>
                     {formatCurrencyAmount(accounts[0]?.currency || 'USD', totalBalance)}
                   </h2>
                 </div>
@@ -86,7 +150,7 @@ const CustomerDashboard = () => {
                   <i className="bi bi-wallet2 text-white" style={{ fontSize: '1.5rem' }}></i>
                 </div>
               </div>
-              <div className="d-flex align-items-center text-success">
+              <div className="d-flex align-items-center" style={trendPositiveStyle}>
                 <i className="bi bi-arrow-up me-1"></i>
                 <small className="fw-semibold">+2.5% from last month</small>
               </div>
@@ -95,14 +159,14 @@ const CustomerDashboard = () => {
         </Col>
 
         <Col lg={4} md={6}>
-          <Card className="border-0 h-100" style={{ borderRadius: 'var(--radius-2xl)', overflow: 'hidden' }}>
-            <Card.Body className="p-4">
+          <Card className="border-0 h-100" style={statCardStyle}>
+            <Card.Body className="p-4" style={{ color: '#f6f7ff' }}>
               <div className="d-flex justify-content-between align-items-start mb-3">
                 <div>
-                  <p className="text-muted mb-2 text-uppercase fw-semibold" style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}>
+                  <p className="text-muted mb-2 text-uppercase fw-semibold" style={statLabelStyle}>
                     Active Accounts
                   </p>
-                  <h2 className="fw-bold mb-0" style={{ fontSize: '2rem', color: 'var(--gray-900)' }}>
+                  <h2 className="fw-bold mb-0" style={statValueStyle}>
                     {activeCount}
                   </h2>
                 </div>
@@ -118,22 +182,24 @@ const CustomerDashboard = () => {
                   <i className="bi bi-bank text-white" style={{ fontSize: '1.5rem' }}></i>
                 </div>
               </div>
-              <div className="d-flex align-items-center text-muted">
-                <small className="fw-semibold">All accounts active</small>
+              <div>
+                <small className="fw-semibold" style={{ color: 'rgba(228, 231, 255, 0.7)' }}>
+                  All accounts active
+                </small>
               </div>
             </Card.Body>
           </Card>
         </Col>
 
         <Col lg={4} md={12}>
-          <Card className="border-0 h-100" style={{ borderRadius: 'var(--radius-2xl)', overflow: 'hidden' }}>
-            <Card.Body className="p-4">
+          <Card className="border-0 h-100" style={statCardStyle}>
+            <Card.Body className="p-4" style={{ color: '#f6f7ff' }}>
               <div className="d-flex justify-content-between align-items-start mb-3">
                 <div>
-                  <p className="text-muted mb-2 text-uppercase fw-semibold" style={{ fontSize: '0.75rem', letterSpacing: '0.05em' }}>
+                  <p className="text-muted mb-2 text-uppercase fw-semibold" style={statLabelStyle}>
                     Quick Action
                   </p>
-                  <h5 className="fw-semibold mb-0" style={{ color: 'var(--gray-900)' }}>
+                  <h5 className="fw-semibold mb-0" style={{ color: '#f6f7ff' }}>
                     Transfer Funds
                   </h5>
                 </div>
@@ -151,13 +217,14 @@ const CustomerDashboard = () => {
               </div>
               <Button 
                 as={Link} 
-                to="/transfer" 
+                to="/payments" 
                 className="w-100 fw-semibold"
                 style={{
                   padding: '0.75rem',
                   borderRadius: 'var(--radius-lg)',
-                  background: 'var(--primary-color)',
-                  border: 'none'
+                  background: 'var(--primary)',
+                  border: 'none',
+                  boxShadow: '0 16px 30px rgba(80, 109, 255, 0.32)'
                 }}
               >
                 Transfer Money
@@ -171,14 +238,14 @@ const CustomerDashboard = () => {
       <Row className="g-4">
         {/* Accounts Section */}
         <Col lg={8}>
-          <Card className="border-0" style={{ borderRadius: 'var(--radius-2xl)' }}>
-            <Card.Body className="p-4">
+          <Card className="glass-nav border-0" style={accountsShellStyle}>
+            <Card.Body className="p-4" style={{ color: '#f6f7ff' }}>
               <div className="d-flex justify-content-between align-items-center mb-4">
                 <div>
-                  <h4 className="fw-bold mb-1" style={{ color: 'var(--gray-900)' }}>
+                  <h4 className="fw-bold mb-1">
                     Your Accounts
                   </h4>
-                  <p className="text-muted mb-0" style={{ fontSize: '0.9375rem' }}>
+                  <p className="mb-0" style={{ fontSize: '0.9375rem', color: 'rgba(228, 231, 255, 0.7)' }}>
                     Manage and view your accounts
                   </p>
                 </div>
@@ -189,9 +256,10 @@ const CustomerDashboard = () => {
                   style={{
                     padding: '0.625rem 1.25rem',
                     borderRadius: 'var(--radius-lg)',
-                    background: 'var(--primary-color)',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
                     border: 'none',
-                    fontSize: '0.9375rem'
+                    fontSize: '0.9375rem',
+                    boxShadow: '0 12px 28px rgba(79, 70, 229, 0.35)'
                   }}
                 >
                   <i className="bi bi-plus-circle me-2"></i>
@@ -207,13 +275,13 @@ const CustomerDashboard = () => {
                       width: '80px',
                       height: '80px',
                       borderRadius: 'var(--radius-full)',
-                      background: 'var(--gray-100)'
+                      background: 'rgba(255, 255, 255, 0.08)'
                     }}
                   >
                     <i className="bi bi-wallet2 text-muted" style={{ fontSize: '2rem' }}></i>
                   </div>
-                  <h5 className="fw-semibold mb-2" style={{ color: 'var(--gray-900)' }}>No accounts yet</h5>
-                  <p className="text-muted mb-4">Create your first account to get started</p>
+                  <h5 className="fw-semibold mb-2" style={{ color: '#f6f7ff' }}>No accounts yet</h5>
+                  <p className="mb-4" style={{ color: 'rgba(228, 231, 255, 0.7)' }}>Create your first account to get started</p>
                   <Button 
                     as={Link} 
                     to="/accounts/create" 
@@ -221,8 +289,9 @@ const CustomerDashboard = () => {
                     style={{
                       padding: '0.75rem 2rem',
                       borderRadius: 'var(--radius-lg)',
-                      background: 'var(--primary-color)',
-                      border: 'none'
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      border: 'none',
+                      boxShadow: '0 12px 28px rgba(79, 70, 229, 0.35)'
                     }}
                   >
                     Create Your First Account
@@ -238,15 +307,10 @@ const CustomerDashboard = () => {
                     >
                       <div 
                         className="p-4 d-flex justify-content-between align-items-center"
-                        style={{
-                          background: 'var(--gray-50)',
-                          borderRadius: 'var(--radius-xl)',
-                          border: '1px solid var(--gray-200)',
-                          transition: 'all var(--transition-base)'
-                        }}
+                        style={accountItemStyle}
                         onMouseEnter={(e) => {
                           e.currentTarget.style.transform = 'translateY(-2px)';
-                          e.currentTarget.style.boxShadow = 'var(--shadow-md)';
+                          e.currentTarget.style.boxShadow = '0 16px 35px rgba(6, 10, 30, 0.4)';
                         }}
                         onMouseLeave={(e) => {
                           e.currentTarget.style.transform = 'translateY(0)';
@@ -260,22 +324,22 @@ const CustomerDashboard = () => {
                               width: '48px',
                               height: '48px',
                               borderRadius: 'var(--radius-lg)',
-                              background: 'var(--primary-color)'
+                              background: 'linear-gradient(135deg, rgba(99, 102, 241, 0.75) 0%, rgba(139, 92, 246, 0.85) 100%)'
                             }}
                           >
                             <i className="bi bi-wallet2 text-white" style={{ fontSize: '1.25rem' }}></i>
                           </div>
                           <div>
-                            <h6 className="fw-semibold mb-1" style={{ color: 'var(--gray-900)' }}>
+                            <h6 className="fw-semibold mb-1" style={{ color: '#f6f7ff' }}>
                               {account.accountType} Account
                             </h6>
-                            <small className="text-muted">
+                            <small style={{ color: 'rgba(228, 231, 255, 0.65)' }}>
                               {account.accountNumber}
                             </small>
                           </div>
                         </div>
                         <div className="text-end">
-                          <h5 className="fw-bold mb-1" style={{ color: 'var(--gray-900)' }}>
+                          <h5 className="fw-bold mb-1" style={{ color: '#f6f7ff' }}>
                             {formatCurrencyAmount(account.currency, account.balance)}
                           </h5>
                           <span 
@@ -300,23 +364,18 @@ const CustomerDashboard = () => {
 
         {/* Quick Actions Sidebar */}
         <Col lg={4}>
-          <Card className="border-0 mb-4" style={{ borderRadius: 'var(--radius-2xl)' }}>
-            <Card.Body className="p-4">
-              <h5 className="fw-bold mb-4" style={{ color: 'var(--gray-900)' }}>
+          <Card className="glass-nav border-0 mb-4" style={quickActionCardStyle}>
+            <Card.Body className="p-4" style={{ color: '#f6f7ff' }}>
+              <h5 className="fw-bold mb-4">
                 Quick Actions
               </h5>
               <div className="d-flex flex-column gap-3">
                 <Button 
                   as={Link} 
-                  to="/transfer" 
+                  to="/payments" 
                   variant="light"
                   className="d-flex align-items-center justify-content-start text-start fw-semibold"
-                  style={{
-                    padding: '1rem',
-                    borderRadius: 'var(--radius-lg)',
-                    border: '1px solid var(--gray-200)',
-                    background: 'white'
-                  }}
+                  style={quickActionButtonStyle}
                 >
                   <div 
                     className="d-flex align-items-center justify-content-center me-3"
@@ -330,8 +389,8 @@ const CustomerDashboard = () => {
                     <i className="bi bi-arrow-left-right text-white"></i>
                   </div>
                   <div>
-                    <div style={{ color: 'var(--gray-900)', fontSize: '0.9375rem' }}>Transfer Money</div>
-                    <small className="text-muted">Send funds to accounts</small>
+                    <div style={{ color: '#f6f7ff', fontSize: '0.9375rem' }}>Transfer Money</div>
+                    <small style={quickActionSubtle}>Send funds to accounts</small>
                   </div>
                 </Button>
 
@@ -340,12 +399,7 @@ const CustomerDashboard = () => {
                   to="/accounts/create" 
                   variant="light"
                   className="d-flex align-items-center justify-content-start text-start fw-semibold"
-                  style={{
-                    padding: '1rem',
-                    borderRadius: 'var(--radius-lg)',
-                    border: '1px solid var(--gray-200)',
-                    background: 'white'
-                  }}
+                  style={quickActionButtonStyle}
                 >
                   <div 
                     className="d-flex align-items-center justify-content-center me-3"
@@ -359,8 +413,8 @@ const CustomerDashboard = () => {
                     <i className="bi bi-plus-circle text-white"></i>
                   </div>
                   <div>
-                    <div style={{ color: 'var(--gray-900)', fontSize: '0.9375rem' }}>Open Account</div>
-                    <small className="text-muted">Create new account</small>
+                    <div style={{ color: '#f6f7ff', fontSize: '0.9375rem' }}>Open Account</div>
+                    <small style={quickActionSubtle}>Create new account</small>
                   </div>
                 </Button>
 
@@ -369,12 +423,7 @@ const CustomerDashboard = () => {
                   to="/credit" 
                   variant="light"
                   className="d-flex align-items-center justify-content-start text-start fw-semibold"
-                  style={{
-                    padding: '1rem',
-                    borderRadius: 'var(--radius-lg)',
-                    border: '1px solid var(--gray-200)',
-                    background: 'white'
-                  }}
+                  style={quickActionButtonStyle}
                 >
                   <div 
                     className="d-flex align-items-center justify-content-center me-3"
@@ -388,8 +437,8 @@ const CustomerDashboard = () => {
                     <i className="bi bi-credit-card text-white"></i>
                   </div>
                   <div>
-                    <div style={{ color: 'var(--gray-900)', fontSize: '0.9375rem' }}>Apply for Credit</div>
-                    <small className="text-muted">Loans & credit cards</small>
+                    <div style={{ color: '#f6f7ff', fontSize: '0.9375rem' }}>Apply for Credit</div>
+                    <small style={quickActionSubtle}>Loans & credit cards</small>
                   </div>
                 </Button>
 
@@ -398,12 +447,7 @@ const CustomerDashboard = () => {
                   to="/payments" 
                   variant="light"
                   className="d-flex align-items-center justify-content-start text-start fw-semibold"
-                  style={{
-                    padding: '1rem',
-                    borderRadius: 'var(--radius-lg)',
-                    border: '1px solid var(--gray-200)',
-                    background: 'white'
-                  }}
+                  style={quickActionButtonStyle}
                 >
                   <div 
                     className="d-flex align-items-center justify-content-center me-3"
@@ -417,8 +461,8 @@ const CustomerDashboard = () => {
                     <i className="bi bi-receipt text-white"></i>
                   </div>
                   <div>
-                    <div style={{ color: 'var(--gray-900)', fontSize: '0.9375rem' }}>Payment History</div>
-                    <small className="text-muted">View transactions</small>
+                    <div style={{ color: '#f6f7ff', fontSize: '0.9375rem' }}>Transactions</div>
+                    <small style={quickActionSubtle}>View transactions</small>
                   </div>
                 </Button>
               </div>

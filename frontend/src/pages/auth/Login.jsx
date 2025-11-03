@@ -4,7 +4,8 @@ import { Form, Button, Alert, Container, Row, Col, Card } from 'react-bootstrap'
 import { useAuth } from '../../hooks/useAuth';
 
 const Login = () => {
-  const [credentials, setCredentials] = useState({ username: '', password: '' });
+  const [credentials, setCredentials] = useState({ username: '', password: '', mfaCode: '' });
+  const [hasMfa, setHasMfa] = useState(false);
   const { login, loading, error } = useAuth();
   const navigate = useNavigate();
 
@@ -48,34 +49,22 @@ const Login = () => {
   };
 
   return (
-    <div className="login-page" style={{ 
-      background: 'var(--background-gradient)',
+    <div className="login-page with-bg auth-shell" style={{ 
       minHeight: '100vh',
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
       padding: '2rem'
     }}>
-      <div style={{ width: '100%', maxWidth: '40vw', minWidth: '500px' }}>
-        <div className="text-center mb-5">
-          <div className="mb-4">
-            <i className="bi bi-bank2 text-white" style={{ fontSize: '5rem' }}></i>
-          </div>
-          <h1 className="text-white fw-bold mb-2" style={{ fontSize: '2.75rem', letterSpacing: '-0.02em' }}>
-            Banking Portal
-          </h1>
-          <p className="text-white opacity-75" style={{ fontSize: '1.25rem' }}>
-            Secure, Modern, Simple
-          </p>
-        </div>
+      <div style={{ width: '100%', maxWidth: '520px', marginTop: '0.5rem' }}>
 
-        <Card className="border-0" style={{ borderRadius: '1.5rem' }}>
-          <Card.Body style={{ padding: '3.5rem 4rem' }}>
+        <Card className="glass-nav border-0" style={{ borderRadius: '1.5rem' }}>
+          <Card.Body style={{ padding: '2.75rem 3rem', color: 'var(--text)' }}>
             <div className="mb-5">
-              <h2 className="fw-bold mb-3" style={{ fontSize: '2rem', color: 'var(--gray-900)', letterSpacing: '-0.02em' }}>
+              <h2 className="fw-bold mb-3" style={{ fontSize: '2rem', color: 'var(--text)', letterSpacing: '-0.02em' }}>
                 Welcome back
               </h2>
-              <p className="text-muted mb-0" style={{ fontSize: '1.125rem', lineHeight: '1.6' }}>
+              <p className="mb-0" style={{ fontSize: '1.05rem', lineHeight: '1.6', color: 'var(--text)', opacity: 0.85 }}>
                 Sign in to your account to continue
               </p>
             </div>
@@ -88,8 +77,8 @@ const Login = () => {
             )}
 
             <Form onSubmit={handleSubmit}>
-              <Form.Group className="mb-4" controlId="username">
-                <Form.Label className="fw-semibold mb-3" style={{ fontSize: '1rem', color: 'var(--gray-700)' }}>
+              <Form.Group className="mb-3" controlId="username">
+                <Form.Label className="fw-semibold mb-3" style={{ fontSize: '1rem', color: 'var(--muted)' }}>
                   Username
                 </Form.Label>
                 <Form.Control
@@ -100,18 +89,12 @@ const Login = () => {
                   onChange={handleChange}
                   required
                   autoComplete="username"
-                  style={{ 
-                    padding: '1.125rem 1.5rem',
-                    fontSize: '1.0625rem',
-                    borderRadius: '0.75rem',
-                    border: '2px solid var(--gray-200)',
-                    transition: 'all 0.2s'
-                  }}
+                  style={{ padding: '0.875rem 1rem', fontSize: '1.05rem', backgroundColor: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'var(--text)' }}
                 />
               </Form.Group>
 
-              <Form.Group className="mb-5" controlId="password">
-                <Form.Label className="fw-semibold mb-3" style={{ fontSize: '1rem', color: 'var(--gray-700)' }}>
+              <Form.Group className="mb-4" controlId="password">
+                <Form.Label className="fw-semibold mb-3" style={{ fontSize: '1rem', color: 'var(--muted)' }}>
                   Password
                 </Form.Label>
                 <Form.Control
@@ -122,32 +105,38 @@ const Login = () => {
                   onChange={handleChange}
                   required
                   autoComplete="current-password"
-                  style={{ 
-                    padding: '1.125rem 1.5rem',
-                    fontSize: '1.0625rem',
-                    borderRadius: '0.75rem',
-                    border: '2px solid var(--gray-200)',
-                    transition: 'all 0.2s'
-                  }}
+                  style={{ padding: '0.875rem 1rem', fontSize: '1.05rem', backgroundColor: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'var(--text)' }}
                 />
               </Form.Group>
 
-              <div className="mt-5 pt-2">
-                <Button 
-                  variant="primary" 
-                  type="submit" 
-                  className="w-100 fw-semibold"
-                  disabled={loading}
-                  style={{
-                    padding: '1.125rem 2rem',
-                    fontSize: '1.125rem',
-                    borderRadius: '0.75rem',
-                    background: 'var(--primary-color)',
-                    border: 'none',
-                    letterSpacing: '0.015em',
-                    transition: 'all 0.2s'
-                  }}
-                >
+              {/* MFA code input (optional) */}
+              <div className="form-check form-switch mb-3">
+                <input className="form-check-input" type="checkbox" id="hasMfa" checked={hasMfa} onChange={(e) => setHasMfa(e.target.checked)} />
+                <label className="form-check-label" htmlFor="hasMfa" style={{ color: 'var(--text)' }}>
+                  I use an authenticator app (MFA)
+                </label>
+              </div>
+              {hasMfa && (
+                <Form.Group className="mb-4" controlId="mfaCode">
+                  <Form.Label className="fw-semibold mb-3" style={{ fontSize: '1rem', color: 'var(--muted)' }}>
+                    6‑digit MFA code
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="mfaCode"
+                    inputMode="numeric"
+                    pattern="[0-9]{6}"
+                    placeholder="Enter 6‑digit code"
+                    value={credentials.mfaCode}
+                    onChange={handleChange}
+                    autoComplete="one-time-code"
+                    style={{ padding: '0.875rem 1rem', fontSize: '1.05rem', backgroundColor: 'rgba(255,255,255,0.06)', borderColor: 'rgba(255,255,255,0.12)', color: 'var(--text)' }}
+                  />
+                </Form.Group>
+              )}
+
+              <div className="mt-4 pt-1">
+                <Button variant="primary" type="submit" className="w-100 fw-semibold hover-grow" disabled={loading} style={{ padding: '1rem 1.75rem', fontSize: '1.0625rem', borderRadius: '0.75rem' }}>
                   {loading ? (
                     <>
                       <span className="spinner-border spinner-border-sm me-2" />
@@ -163,11 +152,7 @@ const Login = () => {
             <div className="mt-5 pt-5 text-center" style={{ borderTop: '1px solid var(--gray-200)' }}>
               <p className="text-muted mb-0" style={{ fontSize: '1.0625rem' }}>
                 Don't have an account?{' '}
-                <Link 
-                  to="/register" 
-                  className="fw-semibold text-decoration-none"
-                  style={{ color: 'var(--primary-color)', fontSize: '1.0625rem' }}
-                >
+                <Link to="/register" className="fw-semibold text-decoration-none" style={{ color: 'var(--primary)', fontSize: '1.0625rem' }}>
                   Create one now →
                 </Link>
               </p>
