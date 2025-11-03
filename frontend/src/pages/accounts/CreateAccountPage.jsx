@@ -34,12 +34,13 @@ const CreateAccountPage = () => {
   };
 
   return (
-    <Container className="py-4">
-      <Card>
-        <Card.Header>
-          <h4 className="mb-0">Open New Account</h4>
+    <Container className="py-4" style={{ maxWidth: 720 }}>
+      <Card className="glass-form-card glass-nav border-0">
+        <Card.Header className="pb-0">
+          <h4 className="mb-1">Open New Account</h4>
+          <p className="mb-0">Choose the account type and currency to get started.</p>
         </Card.Header>
-        <Card.Body>
+        <Card.Body className="pt-4">
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>Account Type</Form.Label>
@@ -68,7 +69,7 @@ const CreateAccountPage = () => {
               </Form.Select>
             </Form.Group>
 
-            <Button type="submit" variant="primary" disabled={loading}>
+            <Button type="submit" variant="primary" className="mt-2" disabled={loading}>
               {loading ? 'Creating...' : 'Create Account'}
             </Button>
           </Form>

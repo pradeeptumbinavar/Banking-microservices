@@ -10,23 +10,37 @@ const CreditProductsPage = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [loans, setLoans] = useState([]);
+  const [cards, setCards] = useState([]);
 
   useEffect(() => {
-    const fetchLoans = async () => {
+    const fetchCredits = async () => {
+      const lookupId = user?.customerId || user?.id;
+      if (!lookupId) {
+        toast.error('Unable to determine customer. Please re-login.');
+        setLoans([]);
+        setCards([]);
+        return;
+      }
       setLoading(true);
       try {
-        const data = await creditService.getCreditProductsByUserId(user.id);
-        // Filter to loans only if mixed
-        const onlyLoans = (data || []).filter(p => p.paymentType ? false : (p.type || p.creditType || 'LOAN') === 'LOAN');
-        setLoans(onlyLoans);
+        const data = await creditService.getCreditProductsByUserId(lookupId);
+        const list = Array.isArray(data) ? data : [];
+        const normalizeType = (item) => {
+          const raw = item?.productType || item?.type || item?.creditType || '';
+          return typeof raw === 'string' ? raw.toUpperCase() : '';
+        };
+        const loanItems = list.filter(item => normalizeType(item) === 'LOAN');
+        const cardItems = list.filter(item => normalizeType(item).includes('CARD'));
+        setLoans(loanItems);
+        setCards(cardItems);
       } catch (e) {
-        toast.error(e.response?.data?.message || 'Failed to load loans');
+        toast.error(e.response?.data?.message || 'Failed to load credit products');
       } finally {
         setLoading(false);
       }
     };
-    fetchLoans();
-  }, [user.id]);
+    fetchCredits();
+  }, [user?.customerId, user?.id]);
 
   return (
     <Container className="py-4">
@@ -90,6 +104,46 @@ const CreditProductsPage = () => {
                       </Badge>
                     </td>
                     <td>{l.createdAt ? new Date(l.createdAt).toLocaleString() : '-'}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </Table>
+          )}
+        </Card.Body>
+      </Card>
+
+      <Card className="glass-nav border-0 mt-4">
+        <Card.Header className="bg-transparent border-0">
+          <h5 className="mb-0" style={{ color: 'var(--text)' }}>Your Cards</h5>
+        </Card.Header>
+        <Card.Body>
+          {loading ? (
+            <LoadingSpinner text="Loading cards..." />
+          ) : cards.length === 0 ? (
+            <p className="text-muted mb-0">No cards yet.</p>
+          ) : (
+            <Table responsive hover className="mb-0">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Credit Limit</th>
+                  <th>Interest</th>
+                  <th>Status</th>
+                  <th>Created</th>
+                </tr>
+              </thead>
+              <tbody>
+                {cards.map(card => (
+                  <tr key={card.id}>
+                    <td>{card.id}</td>
+                    <td>{typeof card.creditLimit === 'number' ? card.creditLimit.toLocaleString() : card.creditLimit || '-'}</td>
+                    <td>{card.interestRate != null ? `${card.interestRate}%` : '-'}</td>
+                    <td>
+                      <Badge bg={card.status === 'APPROVED' ? 'success' : card.status === 'PENDING' ? 'warning' : card.status === 'REJECTED' ? 'danger' : 'secondary'}>
+                        {card.status || 'PENDING'}
+                      </Badge>
+                    </td>
+                    <td>{card.createdAt ? new Date(card.createdAt).toLocaleString() : '-'}</td>
                   </tr>
                 ))}
               </tbody>

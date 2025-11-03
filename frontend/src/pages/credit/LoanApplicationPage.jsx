@@ -9,7 +9,7 @@ const LoanApplicationPage = () => {
   const { user } = useAuth();
   const [formData, setFormData] = useState({
     amount: '',
-    interestRate: '10',
+    interestRate: 10,
     termMonths: '12'
   });
   const [loading, setLoading] = useState(false);
@@ -36,12 +36,13 @@ const LoanApplicationPage = () => {
   };
 
   return (
-    <Container className="py-4">
-      <Card>
-        <Card.Header>
-          <h4 className="mb-0">Loan Application</h4>
+    <Container className="py-4" style={{ maxWidth: 720 }}>
+      <Card className="glass-form-card glass-nav border-0">
+        <Card.Header className="pb-0">
+          <h4 className="mb-1">Loan Application</h4>
+          <p className="mb-0">Fill in the credit request details below.</p>
         </Card.Header>
-        <Card.Body>
+        <Card.Body className="pt-4">
           <Form onSubmit={handleSubmit}>
             <Form.Group className="mb-3">
               <Form.Label>Loan Amount</Form.Label>
@@ -53,21 +54,18 @@ const LoanApplicationPage = () => {
               />
             </Form.Group>
 
-          <Form.Group className="mb-3">
-            <Form.Label>Interest Rate</Form.Label>
-            <InputGroup>
-              <Form.Control
-                type="number"
-                step="0.1"
-                min="0"
-                value={formData.interestRate}
-                onChange={(e) => setFormData({ ...formData, interestRate: e.target.value })}
-                required
-              />
-              <InputGroup.Text>%</InputGroup.Text>
-            </InputGroup>
-            <Form.Text className="text-muted">Default 10%</Form.Text>
-          </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label>Interest Rate</Form.Label>
+              <InputGroup>
+                <Form.Control
+                  type="number"
+                  value={formData.interestRate}
+                  readOnly
+                />
+                <InputGroup.Text>%</InputGroup.Text>
+              </InputGroup>
+              <Form.Text>Fixed promotional APR.</Form.Text>
+            </Form.Group>
 
             <Form.Group className="mb-3">
               <Form.Label>Term (Months)</Form.Label>
@@ -82,7 +80,7 @@ const LoanApplicationPage = () => {
               </Form.Select>
             </Form.Group>
 
-            <Button type="submit" variant="primary" disabled={loading}>
+            <Button type="submit" variant="primary" className="mt-2" disabled={loading}>
               {loading ? 'Submitting...' : 'Submit Application'}
             </Button>
           </Form>

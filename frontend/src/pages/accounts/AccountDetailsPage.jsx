@@ -50,55 +50,56 @@ const AccountDetailsPage = () => {
     : 'secondary';
 
   return (
-    <Container className="py-4">
-      <Card className="shadow-sm">
-        <Card.Header>
+    <Container className="py-4" style={{ maxWidth: 900 }}>
+      <Card className="glass-form-card glass-nav border-0">
+        <Card.Header className="pb-0">
           <div className="d-flex justify-content-between align-items-center">
-            <h4 className="mb-0">Account Details</h4>
+            <h4 className="mb-1">Account Details</h4>
             <span className={`badge bg-${statusVariant}`}>
               {account.status}
             </span>
           </div>
+          <p className="mb-0">View balances, identifiers and recent timestamps for this account.</p>
         </Card.Header>
-        <Card.Body>
+        <Card.Body className="pt-4">
           <Row className="mb-3">
             <Col md={6} className="mb-3">
-              <small className="text-muted d-block">Account Number</small>
-              <div className="fw-semibold">{account.accountNumber}</div>
+              <small className="d-block" style={{ color: 'rgba(228, 231, 255, 0.65)' }}>Account Number</small>
+              <div className="fw-semibold mt-1">{account.accountNumber}</div>
             </Col>
             <Col md={3} className="mb-3">
-              <small className="text-muted d-block">Type</small>
-              <div className="fw-semibold">{account.accountType}</div>
+              <small className="d-block" style={{ color: 'rgba(228, 231, 255, 0.65)' }}>Type</small>
+              <div className="fw-semibold mt-1">{account.accountType}</div>
             </Col>
             <Col md={3} className="mb-3">
-              <small className="text-muted d-block">Currency</small>
-              <div className="fw-semibold">{account.currency}</div>
+              <small className="d-block" style={{ color: 'rgba(228, 231, 255, 0.65)' }}>Currency</small>
+              <div className="fw-semibold mt-1">{account.currency}</div>
             </Col>
           </Row>
 
           <Row className="mb-4">
             <Col md={6} className="mb-3">
-              <small className="text-muted d-block">Balance</small>
-              <div className="h4 mb-0">{formatCurrencyAmount(account.currency, account.balance)}</div>
+              <small className="d-block" style={{ color: 'rgba(228, 231, 255, 0.65)' }}>Balance</small>
+              <div className="h4 mb-0 mt-1">{formatCurrencyAmount(account.currency, account.balance)}</div>
             </Col>
             <Col md={3} className="mb-3">
-              <small className="text-muted d-block">Created At</small>
-              <div className="fw-semibold">{account.createdAt ? new Date(account.createdAt).toLocaleString() : '-'}</div>
+              <small className="d-block" style={{ color: 'rgba(228, 231, 255, 0.65)' }}>Created At</small>
+              <div className="fw-semibold mt-1">{account.createdAt ? new Date(account.createdAt).toLocaleString() : '-'}</div>
             </Col>
             <Col md={3} className="mb-3">
-              <small className="text-muted d-block">Last Activity</small>
-              <div className="fw-semibold">{account.updatedAt ? new Date(account.updatedAt).toLocaleString() : '-'}</div>
+              <small className="d-block" style={{ color: 'rgba(228, 231, 255, 0.65)' }}>Last Activity</small>
+              <div className="fw-semibold mt-1">{account.updatedAt ? new Date(account.updatedAt).toLocaleString() : '-'}</div>
             </Col>
           </Row>
 
-          <Row className="text-muted">
+          <Row style={{ color: 'rgba(228, 231, 255, 0.65)' }}>
             <Col md={3} className="mb-2">
               <small className="d-block">Account ID</small>
-              <small className="fw-semibold">{account.id}</small>
+              <small className="fw-semibold d-block mt-1" style={{ color: '#f6f7ff' }}>{account.id}</small>
             </Col>
             <Col md={3} className="mb-2">
               <small className="d-block">Customer ID</small>
-              <small className="fw-semibold">{account.customerId}</small>
+              <small className="fw-semibold d-block mt-1" style={{ color: '#f6f7ff' }}>{account.customerId}</small>
             </Col>
           </Row>
         </Card.Body>

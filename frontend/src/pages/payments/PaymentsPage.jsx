@@ -1,11 +1,14 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { Container, Card, Tabs, Tab, Row, Col, Form, Button, Spinner } from 'react-bootstrap';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { Container, Card, Tabs, Tab, Row, Col, Form, Button } from 'react-bootstrap';
 import { useAuth } from '../../hooks/useAuth';
 import { accountService } from '../../services/accountService';
 import { deposit as flowDeposit, selfTransfer as flowSelfTransfer, bankTransferExisting, bankTransferExternal } from '../../services/paymentsFlow';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
 import { customerService } from '../../services/customerService';
+import Lottie from 'lottie-react';
+import processingAnimation from '../../assets/lottie/Cycling.json';
+import successAnimation from '../../assets/lottie/payment-success.json';
 
 function AmountInput({ value, onChange }) {
   return (
@@ -25,6 +28,28 @@ export default function PaymentsPage() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
   const [accounts, setAccounts] = useState([]);
+  const [depStatus, setDepStatus] = useState('idle');
+  const [selfStatus, setSelfStatus] = useState('idle');
+  const [bankStatus, setBankStatus] = useState('idle');
+  const depTimerRef = useRef();
+  const selfTimerRef = useRef();
+  const bankTimerRef = useRef();
+
+  const renderButtonAnimation = (state) => {
+    if (state === 'processing') {
+      return <Lottie animationData={processingAnimation} loop style={{ width: 36, height: 36 }} />;
+    }
+    if (state === 'success') {
+      return <Lottie animationData={successAnimation} loop={false} style={{ width: 36, height: 36 }} />;
+    }
+    return null;
+  };
+
+  const getButtonLabel = (label, state) => {
+    if (state === 'processing') return 'Processing...';
+    if (state === 'success') return 'Success!';
+    return label;
+  };
 
   // Deposit
   const [depAccountId, setDepAccountId] = useState('');
@@ -71,12 +96,17 @@ export default function PaymentsPage() {
     const amount = parseFloat(depAmount);
     if (amount <= 0) return toast.error('Enter a valid amount');
     setLoading(true);
+    setDepStatus('processing');
     try {
       await flowDeposit({ accountId: depAccountId, amount });
       toast.success('Deposit successful');
       setDepAmount('');
+      setDepStatus('success');
+      if (depTimerRef.current) clearTimeout(depTimerRef.current);
+      depTimerRef.current = setTimeout(() => setDepStatus('idle'), 1400);
     } catch (err) {
       toast.error(err.response?.data?.message || 'Deposit failed');
+      setDepStatus('idle');
     } finally {
       setLoading(false);
     }
@@ -88,12 +118,17 @@ export default function PaymentsPage() {
     if (!selfFromId || !selfToId || selfFromId === selfToId) return toast.error('Select two different accounts');
     if (amount <= 0) return toast.error('Enter a valid amount');
     setLoading(true);
+    setSelfStatus('processing');
     try {
       await flowSelfTransfer({ fromId: selfFromId, toId: selfToId, amount });
       toast.success('Transfer successful');
       setSelfAmount('');
+      setSelfStatus('success');
+      if (selfTimerRef.current) clearTimeout(selfTimerRef.current);
+      selfTimerRef.current = setTimeout(() => setSelfStatus('idle'), 1400);
     } catch (err) {
       toast.error(err.response?.data?.message || err.message || 'Transfer failed');
+      setSelfStatus('idle');
     } finally {
       setLoading(false);
     }
@@ -110,6 +145,12 @@ export default function PaymentsPage() {
       }
     }
     loadCustomers();
+
+    return () => {
+      if (depTimerRef.current) clearTimeout(depTimerRef.current);
+      if (selfTimerRef.current) clearTimeout(selfTimerRef.current);
+      if (bankTimerRef.current) clearTimeout(bankTimerRef.current);
+    };
   }, []);
 
   // BANK TRANSFER: fetch recipient's ACTIVE accounts
@@ -142,6 +183,7 @@ export default function PaymentsPage() {
     if (!bankFromId || amount <= 0) return toast.error('Enter required fields');
     if (mode === 'existing' && !bankToId) return toast.error('Please select a recipient account');
     setLoading(true);
+    setBankStatus('processing');
     try {
       if (mode === 'existing' && bankToId) {
         await bankTransferExisting({ fromId: bankFromId, toId: bankToId, amount, descriptionPrefix: `Bank transfer to customer ${selectedCustomerId}` });
@@ -168,8 +210,12 @@ export default function PaymentsPage() {
       setExtBankName('');
       setExtIfsc('');
       setExtAccountNumber('');
+      setBankStatus('success');
+      if (bankTimerRef.current) clearTimeout(bankTimerRef.current);
+      bankTimerRef.current = setTimeout(() => setBankStatus('idle'), 1400);
     } catch (err) {
       toast.error(err.response?.data?.message || err.message || 'Payment failed');
+      setBankStatus('idle');
     } finally {
       setLoading(false);
     }
@@ -200,7 +246,12 @@ export default function PaymentsPage() {
                   </Col>
                 </Row>
                 <div className="mt-4">
-                  <Button type="submit" variant="primary" disabled={loading}>{loading ? <Spinner size="sm" /> : 'Deposit'}</Button>
+                  <Button type="submit" variant="primary" disabled={loading}>
+                    <div className="d-flex align-items-center justify-content-center gap-2">
+                      {renderButtonAnimation(depStatus)}
+                      <span>{getButtonLabel('Deposit', depStatus)}</span>
+                    </div>
+                  </Button>
                 </div>
               </Form>
             </Tab>
@@ -227,7 +278,14 @@ export default function PaymentsPage() {
                     <AmountInput value={selfAmount} onChange={setSelfAmount} />
                   </Col>
                 </Row>
-                <div className="mt-4"><Button type="submit" variant="primary" disabled={loading}>{loading ? <Spinner size="sm" /> : 'Transfer'}</Button></div>
+                <div className="mt-4">
+                  <Button type="submit" variant="primary" disabled={loading}>
+                    <div className="d-flex align-items-center justify-content-center gap-2">
+                      {renderButtonAnimation(selfStatus)}
+                      <span>{getButtonLabel('Transfer', selfStatus)}</span>
+                    </div>
+                  </Button>
+                </div>
               </Form>
             </Tab>
 
@@ -301,7 +359,14 @@ export default function PaymentsPage() {
                     <AmountInput value={bankAmount} onChange={setBankAmount} />
                   </Col>
                 </Row>
-                <div className="mt-4"><Button type="submit" variant="primary" disabled={loading}>{loading ? <Spinner size="sm" /> : 'Pay'}</Button></div>
+                <div className="mt-4">
+                  <Button type="submit" variant="primary" disabled={loading}>
+                    <div className="d-flex align-items-center justify-content-center gap-2">
+                      {renderButtonAnimation(bankStatus)}
+                      <span>{getButtonLabel('Pay', bankStatus)}</span>
+                    </div>
+                  </Button>
+                </div>
               </Form>
             </Tab>
           </Tabs>
