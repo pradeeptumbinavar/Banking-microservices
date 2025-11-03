@@ -1,9 +1,9 @@
 package com.banking.account.dto;
 
+import java.math.BigDecimal;
 import lombok.Data;
 
 @Data
 public class AccountUpdateRequest {
-    private String accountType;
-    private String status;
+    private BigDecimal balance;
 }

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import com.banking.customer.dto.ActiveCustomerSummary;
 
 @RestController
 @RequestMapping("/customers")
@@ -100,6 +101,12 @@ public class CustomerController {
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String phone) {
         return ResponseEntity.ok(customerService.searchCustomers(name, email, phone));
+    }
+
+    @GetMapping("/kyc/active")
+    @Operation(summary = "Get all customers with ACTIVE KYC approval")
+    public ResponseEntity<List<ActiveCustomerSummary>> getActiveKycCustomers() {
+        return ResponseEntity.ok(customerService.getActiveKycCustomers());
     }
 }
 

@@ -53,7 +53,7 @@ public class AccountController {
     }
     
     @PutMapping("/{id}")
-    @Operation(summary = "Update account details")
+    @Operation(summary = "Update account balance", description = "Updates the balance of an account. Only the balance field can be modified after account creation.")
     public ResponseEntity<AccountResponse> updateAccount(
             @PathVariable("id") Long id,
             @Valid @RequestBody AccountUpdateRequest request) {
@@ -69,7 +69,12 @@ public class AccountController {
     
     @GetMapping("/user/{userId}")
     @Operation(summary = "Get accounts by user ID")
-    public ResponseEntity<List<AccountResponse>> getAccountsByUserId(@PathVariable("userId") Long userId) {
+    public ResponseEntity<List<AccountResponse>> getAccountsByUserId(
+            @PathVariable("userId") Long userId,
+            @RequestParam(name = "status", required = false) String status) {
+        if (status != null && !status.isEmpty()) {
+            return ResponseEntity.ok(accountService.getAccountsByUserId(userId, status));
+        }
         return ResponseEntity.ok(accountService.getAccountsByUserId(userId));
     }
 }

@@ -79,22 +79,8 @@ public class AccountService {
         Account account = accountRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Account not found"));
         
-        if (request.getAccountType() != null) {
-            try {
-                AccountType accountType = AccountType.valueOf(request.getAccountType().toUpperCase());
-                account.setAccountType(accountType);
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException("Invalid account type: " + request.getAccountType());
-            }
-        }
-        
-        if (request.getStatus() != null) {
-            try {
-                AccountStatus status = AccountStatus.valueOf(request.getStatus().toUpperCase());
-                account.setStatus(status);
-            } catch (IllegalArgumentException e) {
-                throw new RuntimeException("Invalid status: " + request.getStatus());
-            }
+        if (request.getBalance() != null) {
+            account.setBalance(request.getBalance());
         }
         
         account = accountRepository.save(account);
@@ -115,6 +101,20 @@ public class AccountService {
         return accounts.stream()
             .map(this::toResponse)
             .collect(Collectors.toList());
+    }
+    // New overload
+    public List<AccountResponse> getAccountsByUserId(Long userId, String status) {
+        if (status != null && !status.isEmpty()) {
+            try {
+                AccountStatus required = AccountStatus.valueOf(status.toUpperCase());
+                List<Account> accounts = accountRepository.findByCustomerIdAndStatus(userId, required);
+                return accounts.stream().map(this::toResponse).collect(Collectors.toList());
+            } catch (IllegalArgumentException e) {
+                // ignore, fallback
+            }
+        }
+        // fallback to all
+        return getAccountsByUserId(userId);
     }
     
     private String generateAccountNumber() {

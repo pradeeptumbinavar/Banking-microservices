@@ -10,6 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 import com.banking.customer.enums.KYCStatus;
+import com.banking.customer.dto.ActiveCustomerSummary;
 
 @Service
 @RequiredArgsConstructor
@@ -133,6 +134,13 @@ public class CustomerService {
         
         return customers.stream()
             .map(this::toResponse)
+            .collect(Collectors.toList());
+    }
+
+    public List<ActiveCustomerSummary> getActiveKycCustomers() {
+        List<Customer> actives = customerRepository.findByKycStatus(KYCStatus.APPROVED);
+        return actives.stream()
+            .map(c -> new ActiveCustomerSummary(c.getId(), c.getFirstName(), c.getLastName()))
             .collect(Collectors.toList());
     }
     
