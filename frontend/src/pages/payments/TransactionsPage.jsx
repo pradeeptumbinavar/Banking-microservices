@@ -146,7 +146,12 @@ const TransactionsPage = () => {
 
   return (
     <Container className="py-4">
-      <h2 className="mb-4" style={{ color: 'var(--text)' }}>Transactions</h2>
+      <div className="section-heading">
+        <span className="section-heading__icon">
+          <i className="bi bi-receipt" />
+        </span>
+        <h2 className="section-heading__title">Transactions</h2>
+      </div>
       <Card className="glass-nav border-0">
         <Card.Body>
           {/* Filters */}

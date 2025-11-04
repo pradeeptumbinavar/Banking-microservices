@@ -9,16 +9,33 @@
 
 /* Gothic Noir */
 :root[data-theme="noir"] {
-  --bg: #000000;
+  --bg: linear-gradient(165deg, #090d1f 0%, #141131 55%, #1f123c 100%);
   --surface: #111111;
   --text: #F2F2F2;
   --muted: #D1D0D0; /* corrected */
-  --accent-1: #988686;
-  --accent-2: #5C4E4E;
+  --accent-1: #6a7dff;
+  --accent-2: #5B76FF;
 
   --primary: var(--accent-2);
   --primary-contrast: #FFFFFF;
   --border: #222222;
+  --heading-color: #f6f7ff;
+  --heading-icon-color: #f6f7ff;
+}
+
+:root[data-theme="light"] {
+  --bg: linear-gradient(165deg, #f5f8ff 0%, #e0e8ff 55%, #d6e0ff 100%);
+  --surface: #111111;
+  --text: #F2F2F2;
+  --muted: #D1D0D0;
+  --accent-1: #6a7dff;
+  --accent-2: #5B76FF;
+
+  --primary: var(--accent-2);
+  --primary-contrast: #FFFFFF;
+  --border: #222222;
+  --heading-color: #0F172A;
+  --heading-icon-color: #0F172A;
 }
 
 /* Calm Blue */

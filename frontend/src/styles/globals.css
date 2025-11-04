@@ -103,6 +103,17 @@ body {
     linear-gradient(140deg, rgba(5, 9, 22, 0.96) 0%, rgba(16, 18, 38, 0.92) 42%, rgba(36, 18, 58, 0.88) 100%);
 }
 
+:root[data-theme="light"] .page-bg {
+  background-image: none !important;
+}
+
+:root[data-theme="light"] .page-overlay {
+  background:
+    radial-gradient(140% 160% at 15% 0%, rgba(117, 130, 255, 0.22), transparent 55%),
+    radial-gradient(160% 140% at 85% 5%, rgba(105, 210, 255, 0.18), transparent 50%),
+    linear-gradient(150deg, rgba(245, 248, 255, 0.9) 0%, rgba(225, 235, 255, 0.92) 45%, rgba(211, 224, 255, 0.9) 100%);
+}
+
 #root {
   min-height: 100vh;
   display: flex;
@@ -636,47 +647,49 @@ a:hover { text-decoration: underline; }
 
 .glass-form-card {
   border-radius: var(--radius-2xl);
-  background: linear-gradient(150deg, rgba(12, 16, 37, 0.9), rgba(24, 18, 48, 0.88));
-  border: 1px solid rgba(255, 255, 255, 0.06);
-  box-shadow: 0 24px 50px rgba(7, 10, 25, 0.45);
-  color: #f6f7ff;
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  box-shadow: 0 24px 50px rgba(7, 10, 25, 0.32);
+  color: var(--text);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
 }
 
 .glass-form-card .card-header {
   background: transparent;
   border: 0;
-  color: #f6f7ff;
+  color: var(--text);
 }
 
 .glass-form-card .card-header p {
-  color: rgba(228, 231, 255, 0.7);
+  color: color-mix(in srgb, var(--text) 65%, transparent);
 }
 
 .glass-form-card .form-label,
 .glass-form-card .form-text {
-  color: rgba(228, 231, 255, 0.72) !important;
+  color: color-mix(in srgb, var(--text) 70%, transparent) !important;
 }
 
 .glass-form-card .form-control,
 .glass-form-card .form-select {
-  background: rgba(15, 19, 40, 0.85) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: #f6f7ff !important;
+  background: color-mix(in srgb, var(--surface) 85%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--border) 75%, transparent) !important;
+  color: var(--text) !important;
 }
 
 .glass-form-card .form-control::placeholder {
-  color: rgba(228, 231, 255, 0.55);
+  color: color-mix(in srgb, var(--text) 55%, transparent);
 }
 
 .glass-form-card .input-group-text {
-  background: rgba(18, 22, 48, 0.85);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: #f6f7ff;
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+  color: var(--text);
 }
 
 .glass-form-card .btn-primary {
   border-radius: var(--radius-lg);
-  box-shadow: 0 12px 28px rgba(79, 70, 229, 0.28);
+  box-shadow: 0 12px 28px color-mix(in srgb, var(--primary) 35%, transparent);
 }
 
 /* Glass utility for translucent surfaces */
@@ -706,3 +719,45 @@ a:hover { text-decoration: underline; }
 
 /* Consistent top spacing so content doesn't hide under sticky navbar */
 .auth-shell { padding-top: 0; padding-bottom: 3rem; }
+.theme-toggle-btn {
+  border-radius: 999px;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  margin-bottom: 1.75rem;
+  color: var(--heading-color);
+}
+
+.section-heading__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-full);
+  background: color-mix(in srgb, var(--primary) 32%, transparent);
+  color: var(--heading-icon-color);
+  box-shadow: 0 12px 24px color-mix(in srgb, var(--primary) 18%, transparent);
+}
+
+.section-heading__title {
+  margin: 0;
+  font-size: clamp(1.6rem, 2.8vw, 2rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+.section-heading--compact {
+  margin-bottom: 0;
+}
+
+:root[data-theme="light"] .section-heading__icon {
+  background: rgba(15, 23, 42, 0.12);
+  color: var(--heading-icon-color);
+  box-shadow: none;
+}

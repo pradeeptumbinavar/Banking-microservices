@@ -11,7 +11,10 @@ import 'react-toastify/dist/ReactToastify.css';
 import './styles/tokens.css';
 import './styles/globals.css';
 
-if (!document.documentElement.dataset.theme) {
+const storedTheme = localStorage.getItem('theme');
+if (storedTheme) {
+  document.documentElement.dataset.theme = storedTheme;
+} else if (!document.documentElement.dataset.theme) {
   document.documentElement.dataset.theme = 'noir';
 }
 
@@ -48,4 +51,3 @@ root.render(
     </QueryClientProvider>
   </React.StrictMode>
 );
-

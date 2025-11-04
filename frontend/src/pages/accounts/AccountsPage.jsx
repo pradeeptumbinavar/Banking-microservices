@@ -43,10 +43,12 @@ const AccountsPage = () => {
       <Row className="mb-4">
         <Col>
           <div className="d-flex justify-content-between align-items-center">
-            <h2 style={{ color: 'var(--text)' }}>
-              <i className="bi bi-wallet2 me-2"></i>
-              My Accounts
-            </h2>
+            <div className="section-heading section-heading--compact">
+              <span className="section-heading__icon">
+                <i className="bi bi-wallet2" />
+              </span>
+              <h2 className="section-heading__title">My Accounts</h2>
+            </div>
             <Button as={Link} to="/accounts/create" variant="primary">
               <i className="bi bi-plus-circle me-2"></i>
               Open New Account
@@ -74,8 +76,8 @@ const AccountsPage = () => {
                 <Card.Body>
                   <div className="d-flex justify-content-between align-items-start mb-3">
                     <div>
-                      <h5 className="mb-1" style={{ color: 'var(--text)' }}>{account.accountType}</h5>
-                      <small className="text-muted">{account.accountNumber}</small>
+                      <h5 className="mb-1" style={{ color: '#f6f7ff' }}>{account.accountType}</h5>
+                      <small style={{ color: 'rgba(228, 231, 255, 0.65)' }}>{account.accountNumber}</small>
                     </div>
                     <span className={`badge bg-${account.status === 'ACTIVE' ? 'success' : 'warning'}`}>
                       {account.status}
@@ -85,11 +87,11 @@ const AccountsPage = () => {
                   <hr />
                   
                   <div className="mb-3">
-                    <small className="text-muted d-block">Balance</small>
-                    <h3 className="mb-0">{formatCurrencyAmount(account.currency, account.balance)}</h3>
+                    <small className="d-block" style={{ color: 'rgba(228, 231, 255, 0.65)' }}>Balance</small>
+                    <h3 className="mb-0" style={{ color: '#f6f7ff' }}>{formatCurrencyAmount(account.currency, account.balance)}</h3>
                   </div>
                   
-                  <Button as={Link} to={`/accounts/${account.id}`} variant="outline-primary" className="w-100">
+                  <Button as={Link} to={`/accounts/${account.id}`} variant="outline-light" className="w-100">
                     View Details
                   </Button>
                 </Card.Body>

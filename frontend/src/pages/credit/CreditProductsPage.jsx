@@ -44,7 +44,12 @@ const CreditProductsPage = () => {
 
   return (
     <Container className="py-4">
-      <h2 className="mb-4" style={{ color: 'var(--text)' }}>Credit Products</h2>
+      <div className="section-heading">
+        <span className="section-heading__icon">
+          <i className="bi bi-credit-card" />
+        </span>
+        <h2 className="section-heading__title">Credit Products</h2>
+      </div>
       <Row className="g-4 mb-4">
         <Col md={6}>
           <Card className="glass-nav border-0">

@@ -51,9 +51,11 @@ const CustomerDashboard = () => {
 
   const statCardStyle = {
     borderRadius: 'var(--radius-2xl)',
-    background: 'linear-gradient(145deg, rgba(13, 17, 38, 0.94) 0%, rgba(28, 22, 52, 0.88) 100%)',
-    border: '1px solid rgba(255, 255, 255, 0.08)',
-    boxShadow: '0 24px 50px rgba(7, 10, 25, 0.45)',
+    background: 'linear-gradient(145deg, rgba(78, 95, 160, 0.24), rgba(28, 24, 68, 0.12))',
+    border: '1px solid rgba(255, 255, 255, 0.04)',
+    boxShadow: '0 18px 40px rgba(6, 10, 28, 0.18)',
+    backdropFilter: 'blur(24px) saturate(160%)',
+    WebkitBackdropFilter: 'blur(24px) saturate(160%)',
     overflow: 'hidden'
   };
 
@@ -88,16 +90,18 @@ const CustomerDashboard = () => {
 
   const quickActionCardStyle = {
     borderRadius: 'var(--radius-2xl)',
-    background: 'linear-gradient(160deg, rgba(16, 18, 45, 0.92) 0%, rgba(26, 20, 52, 0.88) 100%)',
-    border: '1px solid rgba(255, 255, 255, 0.06)'
+    background: 'linear-gradient(160deg, rgba(72, 92, 168, 0.22) 0%, rgba(34, 30, 78, 0.14) 100%)',
+    border: '1px solid rgba(255, 255, 255, 0.04)',
+    backdropFilter: 'blur(20px) saturate(150%)',
+    WebkitBackdropFilter: 'blur(20px) saturate(150%)'
   };
 
   const quickActionButtonStyle = {
     padding: '1rem',
     borderRadius: 'var(--radius-xl)',
-    border: '1px solid rgba(255, 255, 255, 0.05)',
-    background: 'rgba(18, 22, 48, 0.9)',
-    color: '#f6f7ff'
+    border: '1px solid rgba(255, 255, 255, 0.04)',
+    background: 'rgba(58, 76, 138, 0.18)',
+    color: 'var(--text)'
   };
 
   const quickActionSubtle = {

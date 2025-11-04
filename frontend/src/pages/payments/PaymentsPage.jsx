@@ -3,7 +3,6 @@ import { Container, Card, Tabs, Tab, Row, Col, Form, Button } from 'react-bootst
 import { useAuth } from '../../hooks/useAuth';
 import { accountService } from '../../services/accountService';
 import { deposit as flowDeposit, selfTransfer as flowSelfTransfer, bankTransferExisting, bankTransferExternal } from '../../services/paymentsFlow';
-import api from '../../services/api';
 import { toast } from 'react-toastify';
 import { customerService } from '../../services/customerService';
 import Lottie from 'lottie-react';
@@ -71,6 +70,9 @@ export default function PaymentsPage() {
   const [extBankName, setExtBankName] = useState('');
   const [extIfsc, setExtIfsc] = useState('');
   const [extAccountNumber, setExtAccountNumber] = useState('');
+
+  const labelStyle = { color: 'color-mix(in srgb, var(--text) 88%, transparent)' };
+  const helperStyle = { color: 'color-mix(in srgb, var(--text) 65%, transparent)' };
 
   useEffect(() => {
     const load = async () => {
@@ -227,21 +229,27 @@ export default function PaymentsPage() {
 
   return (
     <Container className="py-4">
-      <Card className="glass-nav border-0">
+      <div className="section-heading">
+        <span className="section-heading__icon">
+          <i className="bi bi-arrow-left-right" />
+        </span>
+        <h2 className="section-heading__title">Payments</h2>
+      </div>
+      <Card className="glass-nav border-0" style={{ color: 'var(--text)' }}>
         <Card.Body>
           <Tabs defaultActiveKey="deposit" className="mb-3">
             <Tab eventKey="deposit" title="Deposit">
               <Form onSubmit={handleDeposit}>
                 <Row className="g-3">
                   <Col md={6}>
-                    <Form.Label className="fw-semibold">Account</Form.Label>
+                    <Form.Label className="fw-semibold" style={labelStyle}>Account</Form.Label>
                     <Form.Select value={depAccountId} onChange={e => setDepAccountId(e.target.value)} required>
                       <option value="">Select account...</option>
                       {accountOptions}
                     </Form.Select>
                   </Col>
                   <Col md={6}>
-                    <Form.Label className="fw-semibold">Amount</Form.Label>
+                    <Form.Label className="fw-semibold" style={labelStyle}>Amount</Form.Label>
                     <AmountInput value={depAmount} onChange={setDepAmount} />
                   </Col>
                 </Row>
@@ -260,21 +268,21 @@ export default function PaymentsPage() {
               <Form onSubmit={handleSelfTransfer}>
                 <Row className="g-3">
                   <Col md={6}>
-                    <Form.Label className="fw-semibold">From</Form.Label>
+                    <Form.Label className="fw-semibold" style={labelStyle}>From</Form.Label>
                     <Form.Select value={selfFromId} onChange={e => setSelfFromId(e.target.value)} required>
                       <option value="">Select account...</option>
                       {accountOptions}
                     </Form.Select>
                   </Col>
                   <Col md={6}>
-                    <Form.Label className="fw-semibold">To</Form.Label>
+                    <Form.Label className="fw-semibold" style={labelStyle}>To</Form.Label>
                     <Form.Select value={selfToId} onChange={e => setSelfToId(e.target.value)} required>
                       <option value="">Select account...</option>
                       {accountOptions}
                     </Form.Select>
                   </Col>
                   <Col md={6}>
-                    <Form.Label className="fw-semibold">Amount</Form.Label>
+                    <Form.Label className="fw-semibold" style={labelStyle}>Amount</Form.Label>
                     <AmountInput value={selfAmount} onChange={setSelfAmount} />
                   </Col>
                 </Row>
@@ -293,14 +301,14 @@ export default function PaymentsPage() {
               <Form onSubmit={handleBankTransfer}>
                 <Row className="g-3">
                   <Col md={6}>
-                    <Form.Label className="fw-semibold">From</Form.Label>
+                    <Form.Label className="fw-semibold" style={labelStyle}>From</Form.Label>
                     <Form.Select value={bankFromId} onChange={e => setBankFromId(e.target.value)} required>
                       <option value="">Select account...</option>
                       {accountOptions}
                     </Form.Select>
                   </Col>
                   <Col md={6}>
-                    <Form.Label className="fw-semibold">Mode</Form.Label>
+                    <Form.Label className="fw-semibold" style={labelStyle}>Mode</Form.Label>
                     <Form.Select value={mode} onChange={e => setMode(e.target.value)}>
                       <option value="existing">Existing Customer</option>
                       <option value="external">External Bank</option>
@@ -310,7 +318,7 @@ export default function PaymentsPage() {
                   {mode === 'existing' ? (
                     <>
                       <Col md={6}>
-                        <Form.Label className="fw-semibold">Customer</Form.Label>
+                        <Form.Label className="fw-semibold" style={labelStyle}>Customer</Form.Label>
                         <Form.Select value={selectedCustomerId} onChange={e => setSelectedCustomerId(e.target.value)}>
                           <option value="">Select customer...</option>
                           {customers.map(c => (
@@ -319,7 +327,7 @@ export default function PaymentsPage() {
                         </Form.Select>
                       </Col>
                       <Col md={6}>
-                        <Form.Label className="fw-semibold">Recipient Account</Form.Label>
+                        <Form.Label className="fw-semibold" style={labelStyle}>Recipient Account</Form.Label>
                         <Form.Select 
                           value={bankToId} 
                           onChange={e => setBankToId(e.target.value)} 
@@ -340,22 +348,22 @@ export default function PaymentsPage() {
                   ) : (
                     <>
                       <Col md={4}>
-                        <Form.Label className="fw-semibold">Bank</Form.Label>
+                        <Form.Label className="fw-semibold" style={labelStyle}>Bank</Form.Label>
                         <Form.Control value={extBankName} onChange={(e)=>setExtBankName(e.target.value)} placeholder="Bank name" />
                       </Col>
                       <Col md={4}>
-                        <Form.Label className="fw-semibold">IFSC</Form.Label>
+                        <Form.Label className="fw-semibold" style={labelStyle}>IFSC</Form.Label>
                         <Form.Control value={extIfsc} onChange={(e)=>setExtIfsc(e.target.value)} placeholder="IFSC" />
                       </Col>
                       <Col md={4}>
-                        <Form.Label className="fw-semibold">Account Number</Form.Label>
+                        <Form.Label className="fw-semibold" style={labelStyle}>Account Number</Form.Label>
                         <Form.Control value={extAccountNumber} onChange={(e)=>setExtAccountNumber(e.target.value)} placeholder="Account number" />
                       </Col>
                     </>
                   )}
 
                   <Col md={6}>
-                    <Form.Label className="fw-semibold">Amount</Form.Label>
+                    <Form.Label className="fw-semibold" style={labelStyle}>Amount</Form.Label>
                     <AmountInput value={bankAmount} onChange={setBankAmount} />
                   </Col>
                 </Row>

@@ -76,10 +76,12 @@ const OnboardingKycPage = () => {
 
   return (
     <div className="container py-5">
-      <Card className="mx-auto" style={{ maxWidth: 720 }}>
-        <Card.Body className="p-4 p-md-5">
-          <h2 className="fw-bold mb-3">Verify your identity</h2>
-          <p className="text-muted mb-4">Submit your KYC details to activate your account</p>
+      <Card className="mx-auto glass-form-card glass-nav border-0" style={{ maxWidth: 720 }}>
+        <Card.Header className="pb-0">
+          <h2 className="fw-bold mb-2">Verify your identity</h2>
+          <p className="mb-0">Submit your KYC details to activate your account</p>
+        </Card.Header>
+        <Card.Body className="p-4 p-md-5 pt-4">
           {resubmit && (
             <Alert variant="warning">Your previous KYC was rejected. Please resubmit with correct details.</Alert>
           )}

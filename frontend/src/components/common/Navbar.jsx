@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { Navbar as BSNavbar, Nav, Container, NavDropdown } from 'react-bootstrap';
+import { Navbar as BSNavbar, Nav, Container, NavDropdown, Button } from 'react-bootstrap';
 import { useAuth } from '../../hooks/useAuth';
 
 const Navbar = () => {
@@ -13,6 +13,16 @@ const Navbar = () => {
   const isKycPending = location.pathname === '/kyc-pending';
   const isMfaSetup = location.pathname === '/mfa-setup';
   const hideNavItems = isAuthPage || isOnboarding || isKycPending || isMfaSetup;
+  const [theme, setTheme] = useState(() => document.documentElement.dataset.theme || 'noir');
+
+  useEffect(() => {
+    document.documentElement.dataset.theme = theme;
+    localStorage.setItem('theme', theme);
+  }, [theme]);
+
+  const toggleTheme = () => {
+    setTheme((prev) => (prev === 'light' ? 'noir' : 'light'));
+  };
 
   const handleLogout = async () => {
     await logout();
@@ -23,14 +33,28 @@ const Navbar = () => {
 
   return (
     <BSNavbar expand="lg" fixed="top" className="mb-0">
-      <Container>
-        <BSNavbar.Brand as={Link} to={brandTo}>
-          <i className="bi bi-bank me-2"></i>
-          Riser ONE
+      <Container className="d-flex align-items-center gap-3">
+        <BSNavbar.Brand as={Link} to={brandTo} className="d-flex align-items-center gap-2">
+          <i className="bi bi-bank"></i>
+          <span>Riser ONE</span>
         </BSNavbar.Brand>
-        {!hideNavItems && (<>
-        <BSNavbar.Toggle aria-controls="basic-navbar-nav" />
-        <BSNavbar.Collapse id="basic-navbar-nav">
+        <div className="ms-auto d-flex align-items-center gap-2">
+          <Button
+            variant={theme === 'light' ? 'outline-dark' : 'outline-light'}
+            size="sm"
+            onClick={toggleTheme}
+            className="px-3 theme-toggle-btn"
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+          >
+            <i className={`bi ${theme === 'light' ? 'bi-moon-stars' : 'bi-sun'} me-1`}></i>
+            {theme === 'light' ? 'Dark' : 'Light'}
+          </Button>
+          {!hideNavItems && (
+            <BSNavbar.Toggle aria-controls="basic-navbar-nav" className="border-0 shadow-none" />
+          )}
+        </div>
+        {!hideNavItems && (
+        <BSNavbar.Collapse id="basic-navbar-nav" className="mt-3 mt-lg-0">
           {!(isLanding && !user) && (
             <Nav className="me-auto">
               <Nav.Link as={Link} to={user?.role === 'ADMIN' ? '/admin' : '/dashboard'}>
@@ -89,11 +113,10 @@ const Navbar = () => {
             </Nav>
           )}
         </BSNavbar.Collapse>
-        </>)}
+        )}
       </Container>
     </BSNavbar>
   );
 };
 
 export default Navbar;
-

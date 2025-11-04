@@ -52,10 +52,12 @@ const OnboardingProfilePage = () => {
 
   return (
     <div className="container py-5">
-      <Card className="mx-auto" style={{ maxWidth: 720 }}>
-        <Card.Body className="p-4 p-md-5">
-          <h2 className="fw-bold mb-3">Tell us about you</h2>
-          <p className="text-muted mb-4">Create your customer profile to continue</p>
+      <Card className="mx-auto glass-form-card glass-nav border-0" style={{ maxWidth: 720 }}>
+        <Card.Header className="pb-0">
+          <h2 className="fw-bold mb-2">Tell us about you</h2>
+          <p className="mb-0">Create your customer profile to continue</p>
+        </Card.Header>
+        <Card.Body className="p-4 p-md-5 pt-4">
           {error && <Alert variant="danger">{error}</Alert>}
           <Form onSubmit={handleSubmit}>
             <Row>
