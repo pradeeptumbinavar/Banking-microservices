@@ -125,7 +125,8 @@ body {
 /* Login & Register Pages - Minimal & Spacious */
 .login-page,
 .register-page {
-  background: var(--background-gradient);
+  /* Use global Background component + page overlay only */
+  background: transparent !important;
   min-height: 100vh;
   padding: var(--spacing-2xl) var(--spacing-lg);
   display: flex;
@@ -645,6 +646,12 @@ a:hover { text-decoration: underline; }
   opacity: 0.96;
 }
 
+/* Ensure muted text is readable on light theme backgrounds */
+:root[data-theme="light"] .text-muted {
+  color: color-mix(in srgb, var(--heading-color) 78%, transparent) !important;
+  opacity: 1;
+}
+
 .glass-form-card {
   border-radius: var(--radius-2xl);
   background: color-mix(in srgb, var(--surface) 72%, transparent);
@@ -710,17 +717,19 @@ a:hover { text-decoration: underline; }
 }
 
 /* Background helper gradient */
-.with-bg {
-  background:
-    radial-gradient(140% 100% at 15% 0%, rgba(116, 94, 255, 0.18), transparent 55%),
-    radial-gradient(160% 120% at 85% 0%, rgba(16, 185, 129, 0.1), transparent 52%),
-    linear-gradient(150deg, #0a0d1f 0%, #151b38 45%, #221a43 100%);
-}
+/* Neutralize historical helper so global background shows consistently */
+.with-bg { background: transparent !important; }
 
 /* Consistent top spacing so content doesn't hide under sticky navbar */
 .auth-shell { padding-top: 0; padding-bottom: 3rem; }
 .theme-toggle-btn {
-  border-radius: 999px;
+  width: 38px;
+  height: 38px;
+  border-radius: var(--radius-full);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
 }

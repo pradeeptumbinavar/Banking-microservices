@@ -66,8 +66,10 @@ const CreditCardGalleryPage = () => {
     <Container className="py-4">
       <div className="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mb-4">
         <div>
-          <h2 className="mb-1" style={{ color: 'var(--text)' }}>Choose Your Card</h2>
-          <p className="text-muted mb-0">Compare designs and perks, then continue to start your application.</p>
+          <h2 className="mb-1" style={{ color: 'var(--heading-color)' }}>Choose Your Card</h2>
+          <p className="mb-0" style={{ color: 'color-mix(in srgb, var(--heading-color) 75%, transparent)' }}>
+            Compare designs and perks, then continue to start your application.
+          </p>
         </div>
         <Button as={Link} to="/credit" variant="outline-primary">
           Back to Credit Products

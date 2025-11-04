@@ -15,6 +15,8 @@ const TransactionsPage = () => {
   const [loading, setLoading] = useState(true);
   const [selectedTransaction, setSelectedTransaction] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const labelStyle = { color: 'color-mix(in srgb, var(--text) 88%, transparent)' };
+  const helperStyle = { color: 'color-mix(in srgb, var(--text) 65%, transparent)' };
 
   // Filters
   const [filterType, setFilterType] = useState('ALL');
@@ -29,17 +31,8 @@ const TransactionsPage = () => {
         const accountsData = await accountService.getAccountsByUserId(lookupId);
         setAccounts(Array.isArray(accountsData) ? accountsData : []);
 
-        const accountIds = accountsData.map(a => a.id);
-        if (accountIds.length === 0) {
-          setPayments([]);
-          setAllPayments([]);
-          return;
-        }
-
-        const lists = await Promise.all(
-          accountIds.map(id => paymentService.getPaymentsByUserId(id).catch(() => []))
-        );
-        const merged = lists.flat();
+        // Fetch all payments once by userId (API is /payments/user/{userId})
+        const merged = await paymentService.getPaymentsByUserId(lookupId).catch(() => []);
         const byId = new Map();
         merged.forEach(p => { if (p?.id != null) byId.set(p.id, p); });
         const unique = Array.from(byId.values()).sort((a, b) => {
@@ -78,10 +71,11 @@ const TransactionsPage = () => {
 
   // Get transaction type
   const getTransactionType = (payment) => {
+    const desc = payment.description || '';
+    if (/loan repayment/i.test(desc)) return 'Loan Repayment';
     if (payment.toAccountId === 0 || payment.toAccountId === null) {
       return 'External Bank Transfer';
     }
-    const desc = payment.description || '';
     if (desc.includes('Deposit') || desc.includes('deposit')) return 'Deposit';
     if (desc.includes('Self transfer') || desc.includes('Self Transfer')) return 'Self Transfer';
     if (desc.includes('Bank transfer') || desc.includes('Bank Transfer')) return 'Bank Transfer';
@@ -157,7 +151,7 @@ const TransactionsPage = () => {
           {/* Filters */}
           <Row className="g-3 mb-4">
             <Col md={4}>
-              <Form.Label className="fw-semibold" style={{ color: 'var(--text)' }}>Type</Form.Label>
+              <Form.Label className="fw-semibold" style={labelStyle}>Type</Form.Label>
               <Form.Select
                 value={filterType}
                 onChange={(e) => setFilterType(e.target.value)}
@@ -169,7 +163,7 @@ const TransactionsPage = () => {
               </Form.Select>
             </Col>
             <Col md={4}>
-              <Form.Label className="fw-semibold" style={{ color: 'var(--text)' }}>Status</Form.Label>
+              <Form.Label className="fw-semibold" style={labelStyle}>Status</Form.Label>
               <Form.Select
                 value={filterStatus}
                 onChange={(e) => setFilterStatus(e.target.value)}
@@ -181,7 +175,7 @@ const TransactionsPage = () => {
               </Form.Select>
             </Col>
             <Col md={4}>
-              <Form.Label className="fw-semibold" style={{ color: 'var(--text)' }}>Time Range</Form.Label>
+              <Form.Label className="fw-semibold" style={labelStyle}>Time Range</Form.Label>
               <Form.Select
                 value={filterTimeRange}
                 onChange={(e) => setFilterTimeRange(e.target.value)}
@@ -197,7 +191,7 @@ const TransactionsPage = () => {
           </Row>
 
           {filteredPayments.length === 0 ? (
-            <p className="text-muted mb-0">No transactions found.</p>
+            <p className="mb-0" style={helperStyle}>No transactions found.</p>
           ) : (
             <div className="table-responsive">
               <Table hover className="mb-0" style={{ color: 'var(--text)' }}>

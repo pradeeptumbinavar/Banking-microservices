@@ -94,6 +94,7 @@ const CreditProductsPage = () => {
                   <th>Term</th>
                   <th>Status</th>
                   <th>Created</th>
+                  <th>Pay EMI</th>
                 </tr>
               </thead>
               <tbody>
@@ -109,6 +110,13 @@ const CreditProductsPage = () => {
                       </Badge>
                     </td>
                     <td>{l.createdAt ? new Date(l.createdAt).toLocaleString() : '-'}</td>
+                    <td>
+                      {l.status === 'APPROVED' || l.status === 'ACTIVE' ? (
+                        <Button as={Link} to={`/credit/loan/${l.id}/pay`} size="sm" variant="outline-primary">Pay EMI</Button>
+                      ) : (
+                        <Button size="sm" variant="outline-secondary" disabled>Pending</Button>
+                      )}
+                    </td>
                   </tr>
                 ))}
               </tbody>

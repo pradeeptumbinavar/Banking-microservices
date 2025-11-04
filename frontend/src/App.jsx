@@ -21,6 +21,7 @@ import TransactionsPage from './pages/payments/TransactionsPage';
 import CreditProductsPage from './pages/credit/CreditProductsPage';
 import CreditCardGalleryPage from './pages/credit/CreditCardGalleryPage';
 import LoanApplicationPage from './pages/credit/LoanApplicationPage';
+import LoanRepaymentPage from './pages/credit/LoanRepaymentPage';
 import ProfilePage from './pages/profile/ProfilePage';
 
 // Admin Pages
@@ -112,6 +113,11 @@ const App = () => {
         <Route path="/credit/loan/apply" element={
           <RequireRole allowedRoles={['CUSTOMER', 'ADMIN']}>
             <LoanApplicationPage />
+          </RequireRole>
+        } />
+        <Route path="/credit/loan/:id/pay" element={
+          <RequireRole allowedRoles={['CUSTOMER', 'ADMIN']}>
+            <LoanRepaymentPage />
           </RequireRole>
         } />
 

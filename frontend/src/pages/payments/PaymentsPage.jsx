@@ -33,6 +33,7 @@ export default function PaymentsPage() {
   const depTimerRef = useRef();
   const selfTimerRef = useRef();
   const bankTimerRef = useRef();
+  const labelStyle = { color: 'color-mix(in srgb, var(--text) 88%, transparent)' };
 
   const renderButtonAnimation = (state) => {
     if (state === 'processing') {
@@ -71,8 +72,33 @@ export default function PaymentsPage() {
   const [extIfsc, setExtIfsc] = useState('');
   const [extAccountNumber, setExtAccountNumber] = useState('');
 
-  const labelStyle = { color: 'color-mix(in srgb, var(--text) 88%, transparent)' };
-  const helperStyle = { color: 'color-mix(in srgb, var(--text) 65%, transparent)' };
+  // Build ACTIVE account option lists for selects
+  const activeAccounts = useMemo(() => (
+    Array.isArray(accounts) ? accounts.filter(a => a?.status === 'ACTIVE') : []
+  ), [accounts]);
+
+  const accountOptionsActive = useMemo(() => (
+    activeAccounts.map(a => (
+      <option key={a.id} value={a.id}>
+        {a.accountNumber} - {a.accountType} - {a.currency} - {a.balance}
+      </option>
+    ))
+  ), [activeAccounts]);
+
+  const accountOptionsSelfTo = useMemo(() => (
+    activeAccounts.map(a => (
+      <option key={a.id} value={a.id} disabled={String(a.id) === String(selfFromId)}>
+        {a.accountNumber} - {a.accountType} - {a.currency} - {a.balance}
+      </option>
+    ))
+  ), [activeAccounts, selfFromId]);
+
+  // Prevent selecting same account in self transfer
+  useEffect(() => {
+    if (selfToId && String(selfToId) === String(selfFromId)) {
+      setSelfToId('');
+    }
+  }, [selfFromId, selfToId]);
 
   useEffect(() => {
     const load = async () => {
@@ -245,7 +271,7 @@ export default function PaymentsPage() {
                     <Form.Label className="fw-semibold" style={labelStyle}>Account</Form.Label>
                     <Form.Select value={depAccountId} onChange={e => setDepAccountId(e.target.value)} required>
                       <option value="">Select account...</option>
-                      {accountOptions}
+                      {accountOptionsActive}
                     </Form.Select>
                   </Col>
                   <Col md={6}>
@@ -271,14 +297,14 @@ export default function PaymentsPage() {
                     <Form.Label className="fw-semibold" style={labelStyle}>From</Form.Label>
                     <Form.Select value={selfFromId} onChange={e => setSelfFromId(e.target.value)} required>
                       <option value="">Select account...</option>
-                      {accountOptions}
+                      {accountOptionsActive}
                     </Form.Select>
                   </Col>
                   <Col md={6}>
                     <Form.Label className="fw-semibold" style={labelStyle}>To</Form.Label>
                     <Form.Select value={selfToId} onChange={e => setSelfToId(e.target.value)} required>
                       <option value="">Select account...</option>
-                      {accountOptions}
+                      {accountOptionsSelfTo}
                     </Form.Select>
                   </Col>
                   <Col md={6}>
@@ -304,7 +330,7 @@ export default function PaymentsPage() {
                     <Form.Label className="fw-semibold" style={labelStyle}>From</Form.Label>
                     <Form.Select value={bankFromId} onChange={e => setBankFromId(e.target.value)} required>
                       <option value="">Select account...</option>
-                      {accountOptions}
+                      {accountOptionsActive}
                     </Form.Select>
                   </Col>
                   <Col md={6}>
@@ -321,9 +347,11 @@ export default function PaymentsPage() {
                         <Form.Label className="fw-semibold" style={labelStyle}>Customer</Form.Label>
                         <Form.Select value={selectedCustomerId} onChange={e => setSelectedCustomerId(e.target.value)}>
                           <option value="">Select customer...</option>
-                          {customers.map(c => (
-                            <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>
-                          ))}
+                          {customers
+                            .filter(c => String(c.id) !== String(user?.customerId || user?.id))
+                            .map(c => (
+                              <option key={c.id} value={c.id}>{c.firstName} {c.lastName}</option>
+                            ))}
                         </Form.Select>
                       </Col>
                       <Col md={6}>

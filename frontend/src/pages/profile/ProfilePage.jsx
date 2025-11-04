@@ -78,7 +78,12 @@ const ProfilePage = () => {
 
   return (
     <Container className="py-4">
-      <h2 className="mb-4" style={{ color: 'var(--text)' }}>Profile</h2>
+      <div className="section-heading">
+        <span className="section-heading__icon">
+          <i className="bi bi-person-circle" />
+        </span>
+        <h2 className="section-heading__title">Profile</h2>
+      </div>
       <Card className="glass-nav border-0">
         <Card.Body>
           <Row className="g-4">

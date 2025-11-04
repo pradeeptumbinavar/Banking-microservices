@@ -25,9 +25,13 @@ export const creditService = {
     return response.data;
   },
 
-  // Update credit product
+  // Update credit product (sends only allowed fields)
   updateCreditProduct: async (id, productData) => {
-    const response = await api.put(`/credits/${id}`, productData);
+    const allowed = ['amount', 'creditLimit', 'interestRate', 'status'];
+    const payload = Object.fromEntries(
+      Object.entries(productData || {}).filter(([k]) => allowed.includes(k))
+    );
+    const response = await api.put(`/credits/${id}`, payload);
     return response.data;
   },
 

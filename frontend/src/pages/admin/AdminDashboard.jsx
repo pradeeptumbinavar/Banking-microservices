@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Container, Card, Tabs, Tab, Row, Col, Form, Button, Table, Spinner, Badge } from 'react-bootstrap';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
@@ -75,6 +75,8 @@ const AdminDashboard = () => {
   const [selectedIds, setSelectedIds] = useState([]);
   const [bulkStatus, setBulkStatus] = useState(null);
   const [loading, setLoading] = useState(false);
+  const [prefetching, setPrefetching] = useState(true);
+  const [cache, setCache] = useState({}); // { KYC: [], Accounts: [], Credits: [], Payments: [] }
 
   const columns = useMemo(() => {
     const desiredByTab = {
@@ -150,10 +152,15 @@ const AdminDashboard = () => {
     const ep = Endpoints[tab];
     setLoading(true);
     try {
+      console.info('[Admin] GET', ep.get);
       const res = await api.get(ep.get);
-      setRows(res.data || res);
+      const data = res.data || res;
+      console.info('[Admin] Loaded', tab, Array.isArray(data) ? data.length : 0);
+      setRows(data);
+      setCache(prev => ({ ...prev, [tab]: data }));
     } catch (e) {
-      toast.error('Failed to load');
+      console.error('[Admin] GET failed', ep.get, e);
+      toast.error(e?.response?.data?.message || 'Failed to load');
       setRows([]);
     } finally {
       setLoading(false);
@@ -162,26 +169,78 @@ const AdminDashboard = () => {
     }
   };
 
+  // Prefetch all approval lists at once on mount
+  useEffect(() => {
+    let isMounted = true;
+    async function prefetchAll() {
+      setPrefetching(true);
+      setLoading(true);
+      try {
+        const entries = Object.entries(Endpoints);
+        const results = await Promise.all(entries.map(async ([key, ep]) => {
+          console.info('[Admin] Prefetch GET', ep.get);
+          try {
+            const res = await api.get(ep.get);
+            return [key, res.data || res];
+          } catch (e) {
+            console.error('[Admin] Prefetch failed', ep.get, e);
+            return [key, []];
+          }
+        }));
+        if (!isMounted) return;
+        const dataMap = Object.fromEntries(results);
+        Object.keys(dataMap).forEach(k => console.info('[Admin] Prefetched', k, Array.isArray(dataMap[k]) ? dataMap[k].length : 0));
+        setCache(dataMap);
+        // Initialize rows for the default active tab from cache
+        setRows(dataMap[active] || []);
+      } catch (e) {
+        if (isMounted) {
+          console.error('[Admin] Prefetch error', e);
+          toast.error(e?.response?.data?.message || 'Failed to prefetch approvals');
+          setRows([]);
+        }
+      } finally {
+        if (isMounted) {
+          setPrefetching(false);
+          setLoading(false);
+          setSelectedIds([]);
+          setBulkStatus(null);
+        }
+      }
+    }
+    prefetchAll();
+    return () => { isMounted = false; };
+  }, []);
+
   const onSelectTab = async (k) => {
     setActive(k);
-    await fetchTab(k);
+    // If cached data exists for this tab, show it immediately; otherwise fetch
+    if (cache && cache[k]) {
+      setRows(cache[k]);
+      setSelectedIds([]);
+      setBulkStatus(null);
+    } else {
+      await fetchTab(k);
+    }
   };
 
   const applyBulk = async () => {
     const ep = Endpoints[active];
     if (!bulkStatus || selectedIds.length === 0) return;
     try {
+      console.info('[Admin] POST', ep.post, { ids: selectedIds, status: bulkStatus });
       await api.post(ep.post, { ids: selectedIds, status: bulkStatus });
       toast.success('Bulk action applied');
       await fetchTab(active);
     } catch (e) {
-      toast.error('Bulk action failed');
+      console.error('[Admin] POST failed', ep.post, e);
+      toast.error(e?.response?.data?.message || 'Bulk action failed');
     }
   };
 
   return (
     <Container className="py-4">
-      <h2 className="mb-4">Admin Approvals</h2>
+      <h2 className="mb-4" style={{ color: 'var(--heading-color)' }}>Admin Approvals</h2>
       <Card className="glass-nav border-0 p-3">
         <Tabs activeKey={active} onSelect={onSelectTab} className="mb-3">
           <Tab eventKey="KYC" title="KYC" />
@@ -190,16 +249,44 @@ const AdminDashboard = () => {
           <Tab eventKey="Payments" title="Payments" />
         </Tabs>
 
-        <BulkBar
-          options={Endpoints[active].statuses}
-          value={bulkStatus}
-          onChange={setBulkStatus}
-          count={selectedIds.length}
-          onApply={applyBulk}
-          disabled={loading}
-        />
-
-        <ApprovalsTable
+        <div className="d-flex justify-content-between align-items-center mb-3">
+          <BulkBar
+            options={Endpoints[active].statuses}
+            value={bulkStatus}
+            onChange={setBulkStatus}
+            count={selectedIds.length}
+            onApply={applyBulk}
+            disabled={loading || prefetching}
+          />
+          <Button variant="outline-secondary" size="sm" disabled={loading || prefetching}
+            onClick={async () => {
+              // Refresh all at once with a single cache update
+              setPrefetching(true);
+              try {
+                const entries = await Promise.all(Object.keys(Endpoints).map(async (key) => {
+                  const res = await api.get(Endpoints[key].get);
+                  const data = res.data || res;
+                  return [key, data];
+                }));
+                const updated = Object.fromEntries(entries);
+                setCache(updated);
+                setRows(updated[active] || []);
+                toast.success('Approvals refreshed');
+              } catch (e) {
+                toast.error(e?.response?.data?.message || 'Failed to refresh approvals');
+              } finally {
+                setPrefetching(false);
+                setSelectedIds([]);
+                setBulkStatus(null);
+              }
+            }}>
+            Refresh All
+          </Button>
+        </div>
+        {prefetching ? (
+          <div className="d-flex justify-content-center py-5"><Spinner /></div>
+        ) : (
+          <ApprovalsTable
           columns={columns}
           rows={rows}
           loading={loading}
@@ -207,7 +294,8 @@ const AdminDashboard = () => {
           onToggleRow={(id, checked) => setSelectedIds(prev => checked ? [...prev, id] : prev.filter(x => x !== id))}
           onToggleAll={(allIds, checked) => setSelectedIds(checked ? allIds : [])}
           statusGetter={statusVariant}
-        />
+          />
+        )}
       </Card>
     </Container>
   );

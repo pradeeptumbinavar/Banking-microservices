@@ -65,7 +65,7 @@ export default function LandingPage() {
         <Container>
           <Row className="justify-content-center text-center mb-4">
             <Col md={9}>
-              <h2 className="mb-3">About us</h2>
+              <h2 className="mb-3" style={{ color: 'var(--heading-color)' }}>About us</h2>
               <p className="text-muted">We are a modern banking platform focused on transparency, speed, and security—so your money moves when you do.</p>
             </Col>
           </Row>

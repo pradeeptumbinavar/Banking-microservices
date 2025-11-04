@@ -1,9 +1,10 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState, useCallback, useMemo } from 'react';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../hooks/useAuth';
 import { accountService } from '../../services/accountService';
+import { paymentService } from '../../services/paymentService';
 import LoadingSpinner from '../../components/common/LoadingSpinner';
 import { formatCurrencyAmount } from '../../utils/currency';
 import { toast } from 'react-toastify';
@@ -13,6 +14,38 @@ const CustomerDashboard = () => {
   const location = useLocation();
   const [accounts, setAccounts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [payments, setPayments] = useState([]);
+
+  // Transactions categorization for the third stat card (hooks must be before any early return)
+  const getTxnType = (p) => {
+    const desc = p?.description || '';
+    if (/loan repayment/i.test(desc)) return 'Loan Repayment';
+    if (p?.toAccountId === 0 || p?.toAccountId === null) return 'External Bank Transfer';
+    if (/deposit/i.test(desc)) return 'Deposit';
+    if (/self transfer/i.test(desc)) return 'Self Transfer';
+    if (/bank transfer/i.test(desc)) return 'Bank Transfer';
+    return 'Transfer';
+  };
+
+  const totalTxns = useMemo(() => payments.length, [payments]);
+  const txnTotals = useMemo(() => {
+    const totals = {};
+    payments.forEach(p => {
+      const t = getTxnType(p);
+      totals[t] = (totals[t] || 0) + 1;
+    });
+    return totals;
+  }, [payments]);
+  const txnPalette = {
+    'Loan Repayment': '#22c55e',
+    'Deposit': '#3b82f6',
+    'Self Transfer': '#f59e0b',
+    'Bank Transfer': '#8b5cf6',
+    'External Bank Transfer': '#ef4444',
+    'Transfer': '#94a3b8'
+  };
+  const txnOrder = ['Loan Repayment','Deposit','Self Transfer','Bank Transfer','External Bank Transfer','Transfer'];
+  
 
   const fetchAccounts = useCallback(async () => {
     setLoading(true);
@@ -35,6 +68,20 @@ const CustomerDashboard = () => {
   }, [user?.customerId, user?.id]);
 
   useEffect(() => { fetchAccounts(); }, [fetchAccounts]);
+  // Fetch recent transactions for stats (non-blocking)
+  useEffect(() => {
+    async function loadPayments() {
+      try {
+        const lookupId = user?.customerId || user?.id;
+        if (!lookupId) return;
+        const list = await paymentService.getPaymentsByUserId(lookupId);
+        setPayments(Array.isArray(list) ? list : []);
+      } catch (_) {
+        setPayments([]);
+      }
+    }
+    loadPayments();
+  }, [user?.customerId, user?.id]);
   // Refresh after navigations that request refresh
   useEffect(() => {
     if (location.state?.refresh === 'accounts') {
@@ -73,6 +120,8 @@ const CustomerDashboard = () => {
   const trendPositiveStyle = {
     color: '#34d399'
   };
+
+  
 
   const accountsShellStyle = {
     borderRadius: 'var(--radius-2xl)',
@@ -114,16 +163,16 @@ const CustomerDashboard = () => {
       <div className="mb-5">
         <h1 className="fw-bold mb-2" style={{ fontSize: '2.25rem', color: 'var(--primary)' }}>
           Welcome back, {user?.username}!{' '}
-          <span style={{ display: 'inline-block', width: 80, height: 80, verticalAlign: 'middle' }}>
+          <span style={{ display: 'inline-block', width: 110, height: 110, verticalAlign: 'middle' }}>
             <DotLottieReact
               src="https://lottie.host/37d27ab1-eb7e-4594-a292-38af58df2e02/BqKK0ZGDz6.lottie"
               loop
               autoplay
-              style={{ width: '60px', height: '60px' }}
+              style={{ width: '96px', height: '96px' }}
             />
           </span>
         </h1>
-        <p className="text-muted mb-0" style={{ fontSize: '1.125rem' }}>
+        <p className="mb-0" style={{ fontSize: '1.125rem', color: 'color-mix(in srgb, var(--heading-color) 80%, transparent)' }}>
           Here's your financial overview for today
         </p>
       </div>
@@ -201,11 +250,11 @@ const CustomerDashboard = () => {
               <div className="d-flex justify-content-between align-items-start mb-3">
                 <div>
                   <p className="text-muted mb-2 text-uppercase fw-semibold" style={statLabelStyle}>
-                    Quick Action
+                    Total Transactions
                   </p>
-                  <h5 className="fw-semibold mb-0" style={{ color: '#f6f7ff' }}>
-                    Transfer Funds
-                  </h5>
+                  <h2 className="fw-bold mb-0" style={statValueStyle}>
+                    {totalTxns}
+                  </h2>
                 </div>
                 <div 
                   className="d-flex align-items-center justify-content-center" 
@@ -213,26 +262,21 @@ const CustomerDashboard = () => {
                     width: '56px', 
                     height: '56px', 
                     borderRadius: 'var(--radius-xl)', 
-                    background: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)'
+                    background: 'linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%)'
                   }}
                 >
-                  <i className="bi bi-arrow-left-right text-white" style={{ fontSize: '1.5rem' }}></i>
+                  <i className="bi bi-receipt text-white" style={{ fontSize: '1.5rem' }}></i>
                 </div>
               </div>
-              <Button 
-                as={Link} 
-                to="/payments" 
-                className="w-100 fw-semibold"
-                style={{
-                  padding: '0.75rem',
-                  borderRadius: 'var(--radius-lg)',
-                  background: 'var(--primary)',
-                  border: 'none',
-                  boxShadow: '0 16px 30px rgba(80, 109, 255, 0.32)'
-                }}
-              >
-                Transfer Money
-              </Button>
+              {/* Category legend (colors retained, progress bar removed) */}
+              <div className="d-flex flex-wrap gap-2">
+                {txnOrder.filter(k => txnTotals[k]).map(k => (
+                  <div key={k} className="d-flex align-items-center" style={{ color: 'rgba(228,231,255,.8)', fontSize: '.8rem' }}>
+                    <span style={{ width: 10, height: 10, borderRadius: 2, background: txnPalette[k], display: 'inline-block', marginRight: 6 }} />
+                    {k} ({txnTotals[k]})
+                  </div>
+                ))}
+              </div>
             </Card.Body>
           </Card>
         </Col>
