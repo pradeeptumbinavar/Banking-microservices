@@ -107,7 +107,7 @@ const CustomerDashboard = () => {
   };
 
   const statLabelStyle = {
-    color: 'rgba(228, 231, 255, 0.7)',
+    color: '#ffffff',
     fontSize: '0.75rem',
     letterSpacing: '0.08em'
   };
@@ -184,7 +184,7 @@ const CustomerDashboard = () => {
             <Card.Body className="p-4" style={{ color: '#f6f7ff' }}>
               <div className="d-flex justify-content-between align-items-start mb-3">
                 <div>
-                  <p className="text-muted mb-2 text-uppercase fw-semibold" style={statLabelStyle}>
+                  <p className="mb-2 text-uppercase fw-semibold" style={statLabelStyle}>
                     Total Balance
                   </p>
                   <h2 className="fw-bold mb-0" style={statValueStyle}>
@@ -216,7 +216,7 @@ const CustomerDashboard = () => {
             <Card.Body className="p-4" style={{ color: '#f6f7ff' }}>
               <div className="d-flex justify-content-between align-items-start mb-3">
                 <div>
-                  <p className="text-muted mb-2 text-uppercase fw-semibold" style={statLabelStyle}>
+                  <p className="mb-2 text-uppercase fw-semibold" style={statLabelStyle}>
                     Active Accounts
                   </p>
                   <h2 className="fw-bold mb-0" style={statValueStyle}>
@@ -249,7 +249,7 @@ const CustomerDashboard = () => {
             <Card.Body className="p-4" style={{ color: '#f6f7ff' }}>
               <div className="d-flex justify-content-between align-items-start mb-3">
                 <div>
-                  <p className="text-muted mb-2 text-uppercase fw-semibold" style={statLabelStyle}>
+                  <p className="mb-2 text-uppercase fw-semibold" style={statLabelStyle}>
                     Total Transactions
                   </p>
                   <h2 className="fw-bold mb-0" style={statValueStyle}>

@@ -32,7 +32,7 @@ class CreditControllerTests {
     @Test
     @DisplayName("POST /credits/loans returns response (200)")
     void applyForLoan_ok() throws Exception {
-        LoanRequest req = new LoanRequest(1L, new BigDecimal("1000"), new BigDecimal("5.5"), 12);
+        LoanRequest req = new LoanRequest(1L, new BigDecimal("1000"), new BigDecimal("5.5"), 12, "PERSONAL");
         when(creditService.applyForLoan(any(LoanRequest.class)))
                 .thenReturn(CreditProductResponse.builder().id(1L).status("PENDING").build());
 
@@ -55,4 +55,3 @@ class CreditControllerTests {
                 .andExpect(jsonPath("$", hasSize(1)));
     }
 }
-

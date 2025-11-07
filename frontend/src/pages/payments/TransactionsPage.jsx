@@ -23,32 +23,34 @@ const TransactionsPage = () => {
   const [filterStatus, setFilterStatus] = useState('ALL');
   const [filterTimeRange, setFilterTimeRange] = useState('ALL');
 
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const lookupId = user?.customerId || user?.id;
-        const accountsData = await accountService.getAccountsByUserId(lookupId);
-        setAccounts(Array.isArray(accountsData) ? accountsData : []);
+  const refreshAll = async () => {
+    setLoading(true);
+    try {
+      const lookupId = user?.customerId || user?.id;
+      const accountsData = await accountService.getAccountsByUserId(lookupId);
+      setAccounts(Array.isArray(accountsData) ? accountsData : []);
 
-        // Fetch all payments once by userId (API is /payments/user/{userId})
-        const merged = await paymentService.getPaymentsByUserId(lookupId).catch(() => []);
-        const byId = new Map();
-        merged.forEach(p => { if (p?.id != null) byId.set(p.id, p); });
-        const unique = Array.from(byId.values()).sort((a, b) => {
-          const ta = a.updatedAt ? new Date(a.updatedAt).getTime() : a.createdAt ? new Date(a.createdAt).getTime() : 0;
-          const tb = b.updatedAt ? new Date(b.updatedAt).getTime() : b.createdAt ? new Date(b.createdAt).getTime() : 0;
-          return tb - ta;
-        });
-        setAllPayments(unique);
-        setPayments(unique);
-      } catch (e) {
-        toast.error(e.response?.data?.message || 'Failed to load transactions');
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
+      // Fetch all payments once by userId (API is /payments/user/{userId})
+      const merged = await paymentService.getPaymentsByUserId(lookupId).catch(() => []);
+      const byId = new Map();
+      merged.forEach(p => { if (p?.id != null) byId.set(p.id, p); });
+      const unique = Array.from(byId.values()).sort((a, b) => {
+        const ta = a.updatedAt ? new Date(a.updatedAt).getTime() : a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const tb = b.updatedAt ? new Date(b.updatedAt).getTime() : b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return tb - ta;
+      });
+      setAllPayments(unique);
+      setPayments(unique);
+    } catch (e) {
+      toast.error(e.response?.data?.message || 'Failed to load transactions');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    refreshAll();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, user?.customerId]);
 
   // Get account number helper
@@ -140,11 +142,16 @@ const TransactionsPage = () => {
 
   return (
     <Container className="py-4">
-      <div className="section-heading">
-        <span className="section-heading__icon">
-          <i className="bi bi-receipt" />
-        </span>
-        <h2 className="section-heading__title">Transactions</h2>
+      <div className="d-flex align-items-center justify-content-between mb-3">
+        <div className="section-heading mb-0">
+          <span className="section-heading__icon">
+            <i className="bi bi-receipt" />
+          </span>
+          <h2 className="section-heading__title">Transactions</h2>
+        </div>
+        <Button variant="outline-primary" onClick={refreshAll} disabled={loading} className="ms-3">
+          {loading ? 'Refreshing...' : 'Refresh All'}
+        </Button>
       </div>
       <Card className="glass-nav border-0">
         <Card.Body>

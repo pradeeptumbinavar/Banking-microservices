@@ -264,7 +264,7 @@ export default function PaymentsPage() {
       <Card className="glass-nav border-0" style={{ color: 'var(--text)' }}>
         <Card.Body>
           <Tabs defaultActiveKey="deposit" className="mb-3">
-            <Tab eventKey="deposit" title="Deposit">
+            <Tab eventKey="deposit" title={<><i className="bi bi-piggy-bank me-1" /> Deposit</>}>
               <Form onSubmit={handleDeposit}>
                 <Row className="g-3">
                   <Col md={6}>
@@ -290,7 +290,7 @@ export default function PaymentsPage() {
               </Form>
             </Tab>
 
-            <Tab eventKey="self" title="Self Transfer">
+            <Tab eventKey="self" title={<><i className="bi bi-arrow-left-right me-1" /> Self Transfer</>}>
               <Form onSubmit={handleSelfTransfer}>
                 <Row className="g-3">
                   <Col md={6}>
@@ -323,7 +323,7 @@ export default function PaymentsPage() {
               </Form>
             </Tab>
 
-            <Tab eventKey="bank" title="Bank Transfer">
+            <Tab eventKey="bank" title={<><i className="bi bi-bank me-1" /> Bank Transfer</>}>
               <Form onSubmit={handleBankTransfer}>
                 <Row className="g-3">
                   <Col md={6}>

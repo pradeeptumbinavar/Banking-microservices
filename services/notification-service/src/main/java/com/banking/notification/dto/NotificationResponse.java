@@ -20,5 +20,7 @@ public class NotificationResponse {
     private String status;
     private LocalDateTime createdAt;
     private LocalDateTime sentAt;
+    private Boolean seen;
+    private LocalDateTime seenAt;
 }
 

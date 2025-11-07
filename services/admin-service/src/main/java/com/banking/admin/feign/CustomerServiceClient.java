@@ -21,5 +21,9 @@ public interface CustomerServiceClient {
 
     @PostMapping("/approvals/bulk")
     String bulkApprove(@RequestBody ApprovalRequest request);
+
+    // For notification targeting
+    @GetMapping("/{id}")
+    com.banking.admin.feign.dto.CustomerResponse getCustomer(@org.springframework.web.bind.annotation.PathVariable("id") Long id);
 }
 

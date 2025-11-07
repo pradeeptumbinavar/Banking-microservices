@@ -6,6 +6,7 @@ import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 
 import java.util.List;
 
@@ -21,5 +22,8 @@ public interface CreditServiceClient {
     
     @PostMapping("/approvals/bulk")
     String bulkApprove(@RequestBody ApprovalRequest request);
+
+    @GetMapping("/{id}")
+    com.banking.admin.feign.dto.CreditProductResponse getCredit(@PathVariable("id") Long id);
 }
 

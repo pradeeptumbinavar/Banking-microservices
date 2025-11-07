@@ -15,6 +15,8 @@ public class CreditProductResponse {
     private Long id;
     private Long customerId;
     private String productType;
+    private String cardType;
+    private String loanType;
     private BigDecimal amount;
     private BigDecimal creditLimit;
     private BigDecimal interestRate;

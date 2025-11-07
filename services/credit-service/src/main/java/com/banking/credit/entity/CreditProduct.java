@@ -2,6 +2,8 @@ package com.banking.credit.entity;
 
 import com.banking.credit.enums.CreditProductType;
 import com.banking.credit.enums.CreditProductStatus;
+import com.banking.credit.enums.CardType;
+import com.banking.credit.enums.LoanType;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -39,6 +41,13 @@ public class CreditProduct {
     private BigDecimal interestRate;
     
     private Integer termMonths; // For loans
+
+    // New: specific subtype fields
+    @Enumerated(EnumType.STRING)
+    private CardType cardType; // For credit cards
+
+    @Enumerated(EnumType.STRING)
+    private LoanType loanType; // For loans
     
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)

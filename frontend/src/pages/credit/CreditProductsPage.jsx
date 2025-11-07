@@ -12,6 +12,7 @@ const CreditProductsPage = () => {
   const [loans, setLoans] = useState([]);
   const [cards, setCards] = useState([]);
 
+
   useEffect(() => {
     const fetchCredits = async () => {
       const lookupId = user?.customerId || user?.id;
@@ -89,6 +90,7 @@ const CreditProductsPage = () => {
               <thead>
                 <tr>
                   <th>ID</th>
+                  <th>Loan Type</th>
                   <th>Amount</th>
                   <th>Interest</th>
                   <th>Term</th>
@@ -101,6 +103,7 @@ const CreditProductsPage = () => {
                 {loans.map(l => (
                   <tr key={l.id}>
                     <td>{l.id}</td>
+                    <td>{l.loanType || '-'}</td>
                     <td>{typeof l.amount === 'number' ? l.amount.toLocaleString() : l.amount}</td>
                     <td>{l.interestRate != null ? `${l.interestRate}%` : '-'}</td>
                     <td>{l.termMonths ? `${l.termMonths} mo` : '-'}</td>
@@ -139,6 +142,7 @@ const CreditProductsPage = () => {
               <thead>
                 <tr>
                   <th>ID</th>
+                  <th>Card Type</th>
                   <th>Credit Limit</th>
                   <th>Interest</th>
                   <th>Status</th>
@@ -149,6 +153,7 @@ const CreditProductsPage = () => {
                 {cards.map(card => (
                   <tr key={card.id}>
                     <td>{card.id}</td>
+                    <td>{card.cardType || '-'}</td>
                     <td>{typeof card.creditLimit === 'number' ? card.creditLimit.toLocaleString() : card.creditLimit || '-'}</td>
                     <td>{card.interestRate != null ? `${card.interestRate}%` : '-'}</td>
                     <td>

@@ -22,5 +22,8 @@ public class LoanRequest {
     
     @NotNull(message = "Term in months is required")
     private Integer termMonths;
+
+    // Optional: specific loan type (HOME, VEHICLE, PERSONAL, EDUCATION)
+    private String loanType;
 }
 

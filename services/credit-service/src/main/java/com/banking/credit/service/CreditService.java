@@ -28,6 +28,29 @@ public class CreditService {
             .termMonths(request.getTermMonths())
             .status(CreditProductStatus.PENDING)
             .build();
+
+        // Map loan type if provided
+        if (request.getLoanType() != null && !request.getLoanType().isBlank()) {
+            try {
+                product.setLoanType(com.banking.credit.enums.LoanType.valueOf(request.getLoanType().toUpperCase()));
+            } catch (IllegalArgumentException ignored) { }
+        }
+
+        // Server-side validation for amount limits per loan type (if provided)
+        if (product.getLoanType() != null && product.getAmount() != null) {
+            java.math.BigDecimal min;
+            java.math.BigDecimal max;
+            switch (product.getLoanType()) {
+                case HOME -> { min = new java.math.BigDecimal("100000"); max = new java.math.BigDecimal("10000000"); }
+                case VEHICLE -> { min = new java.math.BigDecimal("50000"); max = new java.math.BigDecimal("3000000"); }
+                case EDUCATION -> { min = new java.math.BigDecimal("5000"); max = new java.math.BigDecimal("2000000"); }
+                case PERSONAL -> { min = new java.math.BigDecimal("1000"); max = new java.math.BigDecimal("1000000"); }
+                default -> { min = null; max = null; }
+            }
+            if (min != null && (product.getAmount().compareTo(min) < 0 || product.getAmount().compareTo(max) > 0)) {
+                throw new RuntimeException("Loan amount must be between " + min + " and " + max + " for " + product.getLoanType().name() + " loans");
+            }
+        }
         
         product = creditProductRepository.save(product);
         return toResponse(product);
@@ -42,6 +65,13 @@ public class CreditService {
             .interestRate(request.getInterestRate())
             .status(CreditProductStatus.PENDING)
             .build();
+
+        // Map card type if provided
+        if (request.getCardType() != null && !request.getCardType().isBlank()) {
+            try {
+                product.setCardType(com.banking.credit.enums.CardType.valueOf(request.getCardType().toUpperCase()));
+            } catch (IllegalArgumentException ignored) { }
+        }
         
         product = creditProductRepository.save(product);
         return toResponse(product);
@@ -97,6 +127,12 @@ public class CreditService {
         product = creditProductRepository.save(product);
         return toResponse(product);
     }
+
+    public CreditProductResponse getCreditProduct(Long id) {
+        CreditProduct product = creditProductRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Credit product not found"));
+        return toResponse(product);
+    }
     
     @Transactional
     public void closeCreditProduct(Long id) {
@@ -119,6 +155,8 @@ public class CreditService {
             .id(product.getId())
             .customerId(product.getCustomerId())
             .productType(product.getProductType().name())
+            .cardType(product.getCardType() != null ? product.getCardType().name() : null)
+            .loanType(product.getLoanType() != null ? product.getLoanType().name() : null)
             .amount(product.getAmount())
             .creditLimit(product.getCreditLimit())
             .interestRate(product.getInterestRate())

@@ -44,6 +44,19 @@ public class NotificationService {
             .orElseThrow(() -> new RuntimeException("Notification not found"));
         return toResponse(notification);
     }
+
+    public java.util.List<Notification> getByUser(Long userId) {
+        java.util.List<Notification> list = notificationRepository.findByUserId(userId);
+        list.sort((a, b) -> {
+            java.time.LocalDateTime ca = a.getCreatedAt();
+            java.time.LocalDateTime cb = b.getCreatedAt();
+            if (ca == null && cb == null) return 0;
+            if (ca == null) return 1;
+            if (cb == null) return -1;
+            return cb.compareTo(ca);
+        });
+        return list;
+    }
     
     private NotificationResponse toResponse(Notification notification) {
         return NotificationResponse.builder()
@@ -56,7 +69,33 @@ public class NotificationService {
             .status(notification.getStatus().name())
             .createdAt(notification.getCreatedAt())
             .sentAt(notification.getSentAt())
+            .seen(notification.isSeen())
+            .seenAt(notification.getSeenAt())
             .build();
+    }
+
+    public long getUnseenCount(Long userId) {
+        return notificationRepository.countByUserIdAndSeenFalse(userId);
+    }
+
+    @Transactional
+    public void markSeen(Long id) {
+        Notification n = notificationRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Notification not found"));
+        n.setSeen(true);
+        n.setSeenAt(java.time.LocalDateTime.now());
+        notificationRepository.save(n);
+    }
+
+    @Transactional
+    public void markAllSeen(Long userId) {
+        java.util.List<Notification> list = notificationRepository.findByUserIdAndSeenFalse(userId);
+        java.time.LocalDateTime now = java.time.LocalDateTime.now();
+        for (Notification n : list) {
+            n.setSeen(true);
+            n.setSeenAt(now);
+        }
+        notificationRepository.saveAll(list);
     }
 }
 

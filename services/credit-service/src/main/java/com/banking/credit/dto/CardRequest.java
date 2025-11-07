@@ -19,5 +19,8 @@ public class CardRequest {
     
     @NotNull(message = "Interest rate is required")
     private BigDecimal interestRate;
+
+    // Optional: specific card type identifier (e.g., AURORA, ECLIPSE, NOVA)
+    private String cardType;
 }
 

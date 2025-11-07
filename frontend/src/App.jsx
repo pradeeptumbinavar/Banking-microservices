@@ -40,7 +40,7 @@ import LandingPage from './pages/landing/LandingPage';
 import RequireRole from './components/auth/RequireRole';
 
 const App = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, user } = useAuth();
 
   return (
     <>
@@ -49,8 +49,8 @@ const App = () => {
       <main className="content-offset">
       <Routes>
         {/* Public Routes */}
-        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/dashboard" />} />
-        <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to="/dashboard" />} />
+        <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to={user?.role === 'ADMIN' ? '/admin' : '/dashboard'} />} />
+        <Route path="/register" element={!isAuthenticated ? <Register /> : <Navigate to={user?.role === 'ADMIN' ? '/admin' : '/dashboard'} />} />
         <Route path="/mfa-setup" element={isAuthenticated ? <MfaSetup /> : <Navigate to="/login" />} />
         
         {/* KYC Pending Route - Authenticated but not approved */}
@@ -63,7 +63,7 @@ const App = () => {
         {/* Customer Protected Routes */}
         <Route path="/dashboard" element={
           <RequireRole allowedRoles={['CUSTOMER', 'ADMIN']}>
-            <CustomerDashboard />
+            {user?.role === 'ADMIN' ? <Navigate to="/admin" replace /> : <CustomerDashboard />}
           </RequireRole>
         } />
 
@@ -142,7 +142,7 @@ const App = () => {
 
         {/* Error Routes */}
         <Route path="/forbidden" element={<Forbidden />} />
-        <Route path="/" element={isAuthenticated ? <Navigate to="/dashboard" /> : <LandingPage />} />
+        <Route path="/" element={isAuthenticated ? <Navigate to={user?.role === 'ADMIN' ? '/admin' : '/dashboard'} /> : <LandingPage />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
       </main>

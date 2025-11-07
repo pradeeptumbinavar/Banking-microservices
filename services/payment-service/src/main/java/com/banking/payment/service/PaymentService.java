@@ -3,6 +3,7 @@ package com.banking.payment.service;
 import com.banking.payment.dto.*;
 import com.banking.payment.entity.Payment;
 import com.banking.payment.repository.PaymentRepository;
+import com.banking.payment.feign.AccountServiceClient;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +18,7 @@ import com.banking.payment.enums.PaymentType;
 public class PaymentService {
     
     private final PaymentRepository paymentRepository;
+    private final AccountServiceClient accountServiceClient;
     
     @Transactional
     public PaymentResponse createTransfer(TransferRequest request) {
@@ -101,10 +103,16 @@ public class PaymentService {
     }
     
     public List<PaymentResponse> getPaymentsByUserId(Long userId) {
-        // Note: This would require joining with account service to get user's accounts
-        // For now, we'll return payments where userId matches fromAccountId or toAccountId
-        // In a real implementation, you'd need to call account service to get user's account IDs
-        List<Payment> payments = paymentRepository.findByFromAccountIdOrToAccountId(userId, userId);
+        // Resolve user's account IDs from account-service (treat userId as customerId)
+        List<AccountServiceClient.AccountSummary> accounts = accountServiceClient.getAccountsByUserId(userId, null);
+        List<Long> ids = accounts != null ? accounts.stream().map(a -> a.id).collect(Collectors.toList()) : List.of();
+        List<Payment> payments;
+        if (ids.isEmpty()) {
+            // Fallback to legacy behavior to avoid empty screens if lookup fails
+            payments = paymentRepository.findByFromAccountIdOrToAccountId(userId, userId);
+        } else {
+            payments = paymentRepository.findByFromAccountIdInOrToAccountIdIn(ids, ids);
+        }
         return payments.stream()
             .map(this::toResponse)
             .collect(Collectors.toList());

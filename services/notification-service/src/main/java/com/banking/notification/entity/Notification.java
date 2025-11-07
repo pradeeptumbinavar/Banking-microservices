@@ -46,6 +46,13 @@ public class Notification {
     
     @Column(name = "sent_at")
     private LocalDateTime sentAt;
+
+    @Column(name = "seen", nullable = false)
+    @Builder.Default
+    private boolean seen = false;
+
+    @Column(name = "seen_at")
+    private LocalDateTime seenAt;
     
     @PrePersist
     protected void onCreate() {

@@ -23,16 +23,19 @@ public class AdminService {
     private final AccountServiceClient accountServiceClient;
     private final CreditServiceClient creditServiceClient;
     private final PaymentServiceClient paymentServiceClient;
+    private final com.banking.admin.feign.NotificationServiceClient notificationServiceClient;
 
     public AdminService(
             CustomerServiceClient customerServiceClient,
             AccountServiceClient accountServiceClient,
             CreditServiceClient creditServiceClient,
-            PaymentServiceClient paymentServiceClient) {
+            PaymentServiceClient paymentServiceClient,
+            com.banking.admin.feign.NotificationServiceClient notificationServiceClient) {
         this.customerServiceClient = customerServiceClient;
         this.accountServiceClient = accountServiceClient;
         this.creditServiceClient = creditServiceClient;
         this.paymentServiceClient = paymentServiceClient;
+        this.notificationServiceClient = notificationServiceClient;
     }
     
     @CircuitBreaker(name = "admin-service", fallbackMethod = "fallbackEmptyList")
@@ -41,7 +44,30 @@ public class AdminService {
     }
 
     public String bulkApproveCustomers(ApprovalRequest request) {
-        return customerServiceClient.bulkApprove(request);
+        String result = customerServiceClient.bulkApprove(request);
+        // Best-effort notifications for each customer id
+        if (request != null && request.getIds() != null) {
+            for (Long id : request.getIds()) {
+                try {
+                    var cust = customerServiceClient.getCustomer(id);
+                    if (cust != null && cust.getUserId() != null) {
+                        String subject = "KYC " + request.getStatus().toUpperCase();
+                        String message = "Your KYC request (Customer ID: " + id + ") has been " + request.getStatus().toUpperCase() + ".";
+                        var nreq = new com.banking.admin.dto.NotificationRequest(
+                                cust.getUserId(),
+                                "PUSH",
+                                cust.getEmail() != null ? cust.getEmail() : String.valueOf(cust.getUserId()),
+                                subject,
+                                message
+                        );
+                        notificationServiceClient.send(nreq);
+                    }
+                } catch (Exception e) {
+                    // swallow; don't block approvals on notification failure
+                }
+            }
+        }
+        return result;
     }
 
     @CircuitBreaker(name = "admin-service", fallbackMethod = "fallbackEmptyList")
@@ -50,7 +76,30 @@ public class AdminService {
     }
 
     public String bulkApproveAccounts(ApprovalRequest request) {
-        return accountServiceClient.bulkApprove(request);
+        String result = accountServiceClient.bulkApprove(request);
+        if (request != null && request.getIds() != null) {
+            for (Long id : request.getIds()) {
+                try {
+                    var acc = accountServiceClient.getAccount(id);
+                    if (acc != null && acc.getCustomerId() != null) {
+                        var cust = customerServiceClient.getCustomer(acc.getCustomerId());
+                        if (cust != null && cust.getUserId() != null) {
+                            String subject = "Account " + request.getStatus().toUpperCase();
+                            String message = "Your account (ID: " + id + ") status updated to " + request.getStatus().toUpperCase() + ".";
+                            var nreq = new com.banking.admin.dto.NotificationRequest(
+                                    cust.getUserId(),
+                                    "PUSH",
+                                    cust.getEmail() != null ? cust.getEmail() : String.valueOf(cust.getUserId()),
+                                    subject,
+                                    message
+                            );
+                            notificationServiceClient.send(nreq);
+                        }
+                    }
+                } catch (Exception ignored) { }
+            }
+        }
+        return result;
     }
 
     @CircuitBreaker(name = "admin-service", fallbackMethod = "fallbackEmptyList")
@@ -59,7 +108,39 @@ public class AdminService {
     }
 
     public String bulkApproveCredits(ApprovalRequest request) {
-        return creditServiceClient.bulkApprove(request);
+        String result = creditServiceClient.bulkApprove(request);
+        if (request != null && request.getIds() != null) {
+            for (Long id : request.getIds()) {
+                try {
+                    var credit = creditServiceClient.getCredit(id);
+                    if (credit != null && credit.getCustomerId() != null) {
+                        var cust = customerServiceClient.getCustomer(credit.getCustomerId());
+                        if (cust != null && cust.getUserId() != null) {
+                            String typeLabel = (credit.getProductType() != null && credit.getProductType().toUpperCase().contains("CARD"))
+                                    ? "Card"
+                                    : "Loan";
+                            if ("Loan".equals(typeLabel) && credit.getLoanType() != null) {
+                                typeLabel = credit.getLoanType().charAt(0) + credit.getLoanType().substring(1).toLowerCase() + " Loan";
+                            } else if ("Card".equals(typeLabel) && credit.getCardType() != null) {
+                                typeLabel = credit.getCardType().charAt(0) + credit.getCardType().substring(1).toLowerCase() + " Card";
+                            }
+                            String statusUp = request.getStatus().toUpperCase();
+                            String subject = typeLabel + " " + statusUp;
+                            String message = "Your " + typeLabel.toLowerCase() + " (ID: " + id + ") is " + statusUp + ".";
+                            var nreq = new com.banking.admin.dto.NotificationRequest(
+                                    cust.getUserId(),
+                                    "PUSH",
+                                    cust.getEmail() != null ? cust.getEmail() : String.valueOf(cust.getUserId()),
+                                    subject,
+                                    message
+                            );
+                            notificationServiceClient.send(nreq);
+                        }
+                    }
+                } catch (Exception ignored) { }
+            }
+        }
+        return result;
     }
 
     @CircuitBreaker(name = "admin-service", fallbackMethod = "fallbackEmptyList")
@@ -68,7 +149,37 @@ public class AdminService {
     }
 
     public String bulkApprovePayments(ApprovalRequest request) {
-        return paymentServiceClient.bulkApprove(request);
+        String result = paymentServiceClient.bulkApprove(request);
+        if (request != null && request.getIds() != null) {
+            for (Long id : request.getIds()) {
+                try {
+                    var payment = paymentServiceClient.getPayment(id);
+                    Long fromAccId = payment != null ? payment.getFromAccountId() : null;
+                    if (fromAccId != null) {
+                        var acc = accountServiceClient.getAccount(fromAccId);
+                        if (acc != null && acc.getCustomerId() != null) {
+                            var cust = customerServiceClient.getCustomer(acc.getCustomerId());
+                            if (cust != null && cust.getUserId() != null) {
+                                String statusUp = request.getStatus().toUpperCase();
+                                String subject = "Payment " + statusUp;
+                                String amount = payment.getAmount() != null ? payment.getAmount().toPlainString() : "";
+                                String currency = payment.getCurrency() != null ? payment.getCurrency() : "";
+                                String message = "Your payment (ID: " + id + ") for " + amount + " " + currency + " is " + statusUp + ".";
+                                var nreq = new com.banking.admin.dto.NotificationRequest(
+                                        cust.getUserId(),
+                                        "PUSH",
+                                        cust.getEmail() != null ? cust.getEmail() : String.valueOf(cust.getUserId()),
+                                        subject,
+                                        message
+                                );
+                                notificationServiceClient.send(nreq);
+                            }
+                        }
+                    }
+                } catch (Exception ignored) { }
+            }
+        }
+        return result;
     }
 
     private List<ApprovalResponse> fallbackEmptyList(Exception e) {
@@ -76,4 +187,3 @@ public class AdminService {
         return new ArrayList<>();
     }
 }
-

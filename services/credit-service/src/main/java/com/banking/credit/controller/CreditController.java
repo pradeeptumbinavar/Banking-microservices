@@ -53,6 +53,12 @@ public class CreditController {
             @Valid @RequestBody CreditProductUpdateRequest request) {
         return ResponseEntity.ok(creditService.updateCreditProduct(id, request));
     }
+
+    @GetMapping("/{id}")
+    @Operation(summary = "Get credit product by ID")
+    public ResponseEntity<CreditProductResponse> getCreditProductById(@PathVariable("id") Long id) {
+        return ResponseEntity.ok(creditService.getCreditProduct(id));
+    }
     
     @DeleteMapping("/{id}")
     @Operation(summary = "Close or cancel credit product")

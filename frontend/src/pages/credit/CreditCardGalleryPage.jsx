@@ -16,6 +16,13 @@ const cards = [
     image: card1Img,
     creditLimit: 20000,
     interestRate: 16.5,
+    rating: 5,
+    features: [
+      'Airport lounge access',
+      'Accelerated travel points',
+      'No foreign transaction fees',
+      'Complimentary travel insurance',
+    ],
   },
   {
     id: 'eclipse',
@@ -24,6 +31,13 @@ const cards = [
     image: card2Img,
     creditLimit: 15000,
     interestRate: 18.2,
+    rating: 4,
+    features: [
+      'Flat cashback on groceries & dining',
+      'Monthly bonus categories',
+      'Zero annual fee (1st year)',
+      'Purchase protection coverage',
+    ],
   },
   {
     id: 'nova',
@@ -32,6 +46,13 @@ const cards = [
     image: card3Img,
     creditLimit: 8000,
     interestRate: 19.9,
+    rating: 3,
+    features: [
+      'Low annual fee',
+      'Credit-building reports to bureaus',
+      'Fraud protection alerts',
+      'Easy EMI conversion on purchases',
+    ],
   },
 ];
 
@@ -52,6 +73,7 @@ const CreditCardGalleryPage = () => {
         customerId,
         creditLimit: card.creditLimit,
         interestRate: card.interestRate,
+        cardType: (card.id || '').toUpperCase(),
       });
       toast.success(`${card.name} application submitted`);
       navigate('/credit', { state: { refresh: 'credits' } });
@@ -108,6 +130,24 @@ const CreditCardGalleryPage = () => {
                   <h5 style={{ color: 'var(--text)' }}>{card.name}</h5>
                   <p className="text-muted mb-0">{card.description}</p>
                   <div className="mt-2 text-muted" style={{ fontSize: '0.9rem' }}>
+                    {/* Rating */}
+                    <div className="mb-1" style={{ color: 'var(--text)' }}>
+                      {[...Array(5)].map((_, i) => (
+                        <i
+                          key={i}
+                          className={`bi ${i < (card.rating || 0) ? 'bi-star-fill' : 'bi-star'} text-warning me-1`}
+                        />
+                      ))}
+                    </div>
+                    {/* Feature bullets */}
+                    <ul className="list-unstyled mb-2">
+                      {(card.features || []).map((f, idx) => (
+                        <li key={idx} className="d-flex align-items-start">
+                          <i className="bi bi-check-circle-fill text-success me-2" />
+                          <span>{f}</span>
+                        </li>
+                      ))}
+                    </ul>
                     <div>Credit limit: {card.creditLimit.toLocaleString()}</div>
                     <div>APR: {card.interestRate}%</div>
                   </div>

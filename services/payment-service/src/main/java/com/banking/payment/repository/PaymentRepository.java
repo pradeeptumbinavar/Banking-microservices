@@ -13,5 +13,7 @@ public interface PaymentRepository extends JpaRepository<Payment, Long> {
     List<Payment> findByToAccountId(Long toAccountId);
     List<Payment> findByStatus(PaymentStatus status);
     List<Payment> findByFromAccountIdOrToAccountId(Long fromAccountId, Long toAccountId);
+    List<Payment> findByFromAccountIdInOrToAccountIdIn(java.util.Collection<Long> fromAccountIds,
+                                                      java.util.Collection<Long> toAccountIds);
 }
 

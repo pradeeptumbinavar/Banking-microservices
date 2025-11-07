@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { Container, Card, Row, Col, Form, Button, Alert } from 'react-bootstrap';
 import { useAuth } from '../../hooks/useAuth';
 import { creditService } from '../../services/creditService';
@@ -135,11 +135,16 @@ const LoanRepaymentPage = () => {
 
   return (
     <Container className="py-4">
-      <div className="section-heading">
-        <span className="section-heading__icon">
-          <i className="bi bi-credit-card" />
-        </span>
-        <h2 className="section-heading__title">Loan Repayment</h2>
+      <div className="d-flex align-items-center justify-content-between mb-3">
+        <div className="section-heading mb-0">
+          <span className="section-heading__icon">
+            <i className="bi bi-credit-card" />
+          </span>
+          <h2 className="section-heading__title">Loan Repayment</h2>
+        </div>
+        <Button as={Link} to="/credit" variant="outline-primary">
+          Back to Credit Products
+        </Button>
       </div>
 
       <Card className="glass-nav border-0">
