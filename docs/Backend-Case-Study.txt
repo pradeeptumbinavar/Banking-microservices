@@ -1,0 +1,46 @@
+Banking Microservices Backend Case Study
+
+1) Cover Page
+- Title: Banking Microservices Backend Case Study
+- Prepared By: (not provided)
+- Date: (see repository history)
+- Training Request Number: (not provided)
+
+2) Introduction
+- Problem/Goal: Implement a modular banking system as separate services (auth, customers, accounts, credits, payments, notifications, admin). Objectives include JWT-secured endpoints, service discovery, admin-driven approvals, and user notifications.
+
+3) Solution Approach
+- Architecture: Microservices with Spring Boot; service-to-service calls via OpenFeign; discovery via Eureka; resilience via Resilience4j (circuit breaker on admin reads).
+- Security: OAuth2 Resource Server (JWT) on downstream services; API Gateway routes traffic; role-based access (CUSTOMER, ADMIN).
+- Scalability/Isolation: Separate services per bounded context; independent deployment possible.
+- Compliance: No explicit configs for GDPR/PCI/RBI present in this repo (not claimed).
+
+4) Implementation Details
+- Languages/Frameworks: Java 21, Spring Boot 3.2.x, Spring Web, Spring Data JPA, Lombok, springdoc-openapi.
+- Spring Cloud: Eureka (service registry), OpenFeign (HTTP clients), Resilience4j (circuit breaker), Netflix client for discovery.
+- Security: spring-boot-starter-oauth2-resource-server (JWT validation) used by services.
+- Databases: MySQL (e.g., notification-service uses MySQL with JPA/Hibernate). Others use JPA repositories and are wired for MySQL.
+- Deployment: Local Spring Boot apps via Maven; Eureka Server + API Gateway present. No Kubernetes/Helm/CI pipeline files exist in the repo.
+
+5) Screenshots/Diagrams
+- System architecture diagram: Not included as an image in the repo. Text summary: Client → API Gateway → {auth, customer, account, credit, payment, notification, admin}; services register to Eureka and communicate via Feign.
+- Sample UI: React frontend exists but images are not embedded here.
+- API flow (text): Admin approvals → AdminService bulk endpoints → Feign calls to domain services → NotificationService /notifications/send to push user notifications.
+
+6) Testing Evidence
+- Unit tests: Mockito/MockMvc tests added for admin/account/credit/customer/notification/payment/auth (controllers + services). Tests run locally.
+- Coverage reporting and performance/load tests: Not present in the repo.
+
+7) Challenges & Mitigation
+- Transaction listing (frontend called /payments/user/{customerId}): Fixed payment-service to resolve user’s account IDs via account-service and fetch payments for those accounts; added Feign interceptor to forward Authorization header to avoid 401s.
+- Eureka instance naming: Standardized eureka.instance.* so instances appear as service-name:port.
+- Notifications: Added list + seen/unseen endpoints; wired admin approvals (KYC, accounts, credits, payments) to push user notifications; added frontend bell with unread indicator and 30s polling.
+
+8) Conclusion
+- Benefits: Clear service boundaries, JWT-secured endpoints, admin approval workflows, user notifications, resilient service calls.
+- Future enhancements (not implemented here): Real-time notifications (SSE/WebSocket), audit trails, finer RBAC, metrics/observability stack, CI/CD pipeline.
+
+9) References
+- Tools/Frameworks: Spring Boot, Spring Security (JWT), Spring Cloud (Eureka, OpenFeign, Resilience4j), JPA/Hibernate, Lombok, springdoc-openapi.
+- Standards/Compliance: None explicitly configured in the repo; not claimed.
+

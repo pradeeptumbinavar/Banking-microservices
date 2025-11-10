@@ -1,8 +1,16 @@
-import React from 'react';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Container, Row, Col, Card, Button, Image, Carousel } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import Footer from '../../components/common/Footer';
 import { DotLottieReact } from '@lottiefiles/dotlottie-react';
+import customersImg from '../../assets/images/hero-customers.png';
+import loansImg from '../../assets/images/hero-loans.png';
+import cardsImg from '../../assets/images/hero-cards.png';
+import secureImg from '../../assets/images/hero-secure.png';
+import satisfiedCustomersFull from '../../assets/images/satisfied customers.png';
+import loanCard1 from '../../assets/images/loan card 1.png';
+import loanCard2 from '../../assets/images/loan card 2.png';
+import loanCard3 from '../../assets/images/loan card 3.png';
 
 const FeatureCard = ({ icon, title, text }) => (
   <Card className="p-3 hover-lift" style={{ minWidth: 280 }}>
@@ -25,6 +33,58 @@ const FeaturePanel = ({ src, title, text, color }) => (
 );
 
 export default function LandingPage() {
+  // Carousel slides (loan images)
+  const loanSlides = [
+    {
+      img: loanCard1,
+      title: 'Home Loans — set down roots',
+      desc: 'Low rates and flexible tenure for your dream home. Introductory processing fee waiver for approved KYC.'
+    },
+    {
+      img: loanCard2,
+      title: 'Vehicle Loans — drive your dream',
+      desc: 'Quick approvals for new or used vehicles with clear monthly repayments and simple documentation.'
+    },
+    {
+      img: loanCard3,
+      title: 'Education Loans — invest in learning',
+      desc: 'Cover tuition and living costs with friendly repayment options and zero prepayment charges during offers.'
+    }
+  ];
+
+  // Typing animation for heading: vehicle / education / home
+  const words = ['VEHICLES', 'EDUCATION', 'HOME'];
+  const [wIdx, setWIdx] = useState(0);
+  const [chars, setChars] = useState(0);
+  const [deleting, setDeleting] = useState(false);
+
+  useEffect(() => {
+    const current = words[wIdx];
+    // Slower typing/deleting and small pauses at word boundaries
+    let delay = deleting ? 120 : 180; // ms per step
+    if (!deleting && chars === current.length) delay = 1200; // pause when word complete
+    if (deleting && chars === 0) delay = 700; // brief pause before next word
+
+    const timer = setTimeout(() => {
+      if (!deleting) {
+        if (chars < current.length) {
+          setChars(chars + 1);
+        } else {
+          setDeleting(true);
+        }
+      } else {
+        if (chars > 0) {
+          setChars(chars - 1);
+        } else {
+          setDeleting(false);
+          setWIdx((wIdx + 1) % words.length);
+        }
+      }
+    }, delay);
+    return () => clearTimeout(timer);
+  }, [chars, deleting, wIdx]);
+
+  const typed = words[wIdx].substring(0, chars);
   return (
     <div className="d-flex flex-column min-vh-100 with-bg">
       {/* Hero */}
@@ -60,6 +120,99 @@ export default function LandingPage() {
         </Container>
       </section>
 
+      {/* Loans carousel (moved just after hero) */}
+      <section className="py-4" style={{ marginBottom: '2rem' }}>
+        <Container>
+          <div className="text-center mb-3">
+            <h3 className="mb-0" style={{ color: 'var(--heading-color)' }}>
+              Exciting loans for{' '}
+              <span style={{ color: 'var(--primary)' }}>{typed}</span>
+              <span className="ms-1" style={{ color: 'var(--primary)' }}>|</span>
+            </h3>
+          </div>
+          {/* Local styles to slim down the dark control overlays */}
+          <style>{`
+            .landing-carousel .carousel-control-prev, 
+            .landing-carousel .carousel-control-next { 
+              width: 8%; 
+              background: transparent; 
+            }
+            .landing-carousel .carousel-control-prev:hover, 
+            .landing-carousel .carousel-control-next:hover { 
+              background: rgba(0,0,0,0.18); 
+            }
+          `}</style>
+          <Carousel className="landing-carousel" fade interval={2000} indicators controls>
+            {loanSlides.map((s, idx) => (
+              <Carousel.Item key={idx}>
+                <div style={{ position: 'relative', borderRadius: '1rem', overflow: 'hidden' }}>
+                  <img
+                    src={s.img}
+                    alt={s.title}
+                    style={{ width: '100%', height: '60vh', objectFit: 'cover', objectPosition: 'center 30%' }}
+                  />
+                  <div
+                    style={{
+                      position: 'absolute',
+                      left: '50%',
+                      bottom: '16px',
+                      transform: 'translateX(-50%)',
+                      width: '94%',
+                      maxWidth: '1200px',
+                      color: '#fff',
+                      background: 'rgba(2, 6, 23, 0.45)',
+                      padding: '16px 24px',
+                      borderRadius: '16px',
+                      boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
+                      backdropFilter: 'blur(6px)',
+                      WebkitBackdropFilter: 'blur(6px)'
+                    }}
+                  >
+                    <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>{s.title}</div>
+                    <div style={{ fontSize: '0.95rem', opacity: 0.95 }}>{s.desc}</div>
+                  </div>
+                </div>
+              </Carousel.Item>
+            ))}
+          </Carousel>
+        </Container>
+      </section>
+
+      {/* Full-bleed image just after hero */}
+      <section className="py-0" style={{ marginBottom: '2rem' }}>
+        <Container fluid className="p-0">
+          <div style={{ position: 'relative' }}>
+            <img
+              src={satisfiedCustomersFull}
+              alt="Satisfied customers banner"
+              style={{ width: '100%', height: '100vh', objectFit: 'cover', display: 'block' }}
+            />
+            <div
+              style={{
+                position: 'absolute',
+                left: '50%',
+                bottom: '32px',
+                transform: 'translateX(-50%)',
+                color: '#fff',
+                background: 'rgba(2, 6, 23, 0.45)',
+                padding: '16px 32px',
+                borderRadius: '16px',
+                boxShadow: '0 10px 30px rgba(0,0,0,0.35)',
+                backdropFilter: 'blur(6px)',
+                WebkitBackdropFilter: 'blur(6px)',
+                textAlign: 'center',
+                pointerEvents: 'none',
+                width: '90%',
+                maxWidth: '1200px'
+              }}
+            >
+              <div style={{ fontSize: '1.25rem', fontWeight: 700 }}>Satisfied customers worldwide</div>
+              <div style={{ fontSize: '0.9rem', opacity: 0.9 }}>Modern, secure, and effortless digital banking</div>
+            </div>
+          </div>
+        </Container>
+      </section>
+
       {/* About */}
       <section className="py-5">
         <Container>
@@ -72,7 +225,7 @@ export default function LandingPage() {
         </Container>
       </section>
 
-      {/* Features — vertical panels with Lottie */}
+      {/* Features – vertical panels with Lottie */}
       <section className="py-5">
         <Container>
           <div className="mx-auto d-flex flex-column gap-4" style={{ maxWidth: '760px' }}>
@@ -97,6 +250,9 @@ export default function LandingPage() {
           </div>
         </Container>
       </section>
+
+
+      {/* Loans carousel moved above; section removed here */}
 
       <Footer />
     </div>

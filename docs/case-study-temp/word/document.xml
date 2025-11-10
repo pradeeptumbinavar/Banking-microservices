@@ -1,0 +1,55 @@
+﻿<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<w:document xmlns:w="http://schemas.openxmlformats.org/wordprocessingml/2006/main">
+  <w:body>
+    <w:p><w:r><w:t>Banking Microservices Backend Case Study</w:t></w:r></w:p>
+    <w:p/>
+    <w:p><w:r><w:t>1. Cover Page</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Title: Banking Microservices Backend Case Study</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Prepared By: (not provided)</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Date: </w:t><w:t xml:space="preserve">(see repository commit time)</w:t></w:r></w:p>
+    <w:p/>
+
+    <w:p><w:r><w:t>2. Introduction</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Goal: Build a modular banking system using microservices for accounts, customers, credits, payments, notifications, and admin approvals. Objectives include secure JWT-based authentication, clear service boundaries, service discovery, and admin-driven approvals with user notifications.</w:t></w:r></w:p>
+    <w:p/>
+
+    <w:p><w:r><w:t>3. Solution Approach</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Architecture: Microservices with Spring Boot and Spring Cloud. Each bounded context is a separate service (auth, customer, account, credit, payment, notification, admin), registered with Eureka and called via OpenFeign.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Security: OAuth2 Resource Server with JWT validation in downstream services. The API Gateway mediates traffic. Admin approvals trigger notifications to users.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Resilience: Resilience4j circuit breaker on admin fan-out reads (fallback to empty lists).</w:t></w:r></w:p>
+    <w:p/>
+
+    <w:p><w:r><w:t>4. Implementation Details</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Languages/Frameworks: Java 21, Spring Boot 3.2.x, Spring Web, Spring Data JPA, Spring Security (JWT), Spring Cloud (Eureka, OpenFeign, Resilience4j), Lombok, springdoc-openapi.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Databases: MySQL (e.g., notification-service uses MySQL with JPA).</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Frontend: React (not covered in this backend case study, but present in the repository).</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Deployment: Local dev via Spring Boot apps; no Kubernetes/CI configuration present in the repository.</w:t></w:r></w:p>
+    <w:p/>
+
+    <w:p><w:r><w:t>5. Screenshots/Diagrams</w:t></w:r></w:p>
+    <w:p><w:r><w:t>System Architecture: Not included as an image. Architecture described textually in this document.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Sample UI: Not embedded; the React frontend is part of the repo.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>API Flow: Admin approvals &rarr; AdminService &rarr; Feign calls to domain services &rarr; NotificationService for user PUSH notifications.</w:t></w:r></w:p>
+    <w:p/>
+
+    <w:p><w:r><w:t>6. Testing Evidence</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Unit tests: Mockito/MockMvc tests added for admin/account/credit/customer/notification/payment/auth services (controllers and services). Tests pass locally.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Coverage: Not measured in repo; no performance/load tests present.</w:t></w:r></w:p>
+    <w:p/>
+
+    <w:p><w:r><w:t>7. Challenges &amp; Mitigation</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Transaction listing: Frontend queries /payments/user/{customerId}. Fixed backend to resolve the user&apos;s account IDs via account-service and fetch payments for those accounts; forwarded Authorization header in payment-service Feign to avoid 401s.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Eureka instance naming: Standardized eureka.instance fields so instances appear as service-name:port.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Notifications: Added endpoints for listing and seen/unseen; integrated admin approvals to push user notifications (KYC, accounts, credits, payments).</w:t></w:r></w:p>
+    <w:p/>
+
+    <w:p><w:r><w:t>8. Conclusion</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Benefits: Clear service boundaries, JWT-secured endpoints, admin approval workflows with user notifications, resilient Feign calls. Future enhancements: real-time notification streaming (SSE/WebSocket), richer audit logs, role-based reporting, and additional validations.</w:t></w:r></w:p>
+    <w:p/>
+
+    <w:p><w:r><w:t>9. References</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Frameworks: Spring Boot, Spring Security (JWT), Spring Cloud (Eureka, OpenFeign, Resilience4j), springdoc-openapi, Lombok.</w:t></w:r></w:p>
+    <w:p><w:r><w:t>Standards/Compliance: Not specified in the repository. No explicit GDPR/PCI/RBI configurations included.</w:t></w:r></w:p>
+    <w:sectPr/>
+  </w:body>
+</w:document>
