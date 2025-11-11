@@ -25,5 +25,8 @@ public interface CreditServiceClient {
 
     @GetMapping("/{id}")
     com.banking.admin.feign.dto.CreditProductResponse getCredit(@PathVariable("id") Long id);
+
+    @GetMapping("/all")
+    java.util.List<com.banking.admin.feign.dto.CreditProductResponse> getAllCredits();
 }
 

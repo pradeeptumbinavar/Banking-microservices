@@ -108,5 +108,11 @@ public class CustomerController {
     public ResponseEntity<List<ActiveCustomerSummary>> getActiveKycCustomers() {
         return ResponseEntity.ok(customerService.getActiveKycCustomers());
     }
+
+    @GetMapping("/all")
+    @Operation(summary = "Get all customers (any status)")
+    public ResponseEntity<List<CustomerResponse>> getAllCustomers() {
+        return ResponseEntity.ok(customerService.getAllCustomers());
+    }
 }
 

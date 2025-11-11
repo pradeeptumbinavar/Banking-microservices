@@ -4,5 +4,8 @@ public enum AccountStatus {
     PENDING,
     ACTIVE,
     SUSPENDED,
-    CLOSED
+    CLOSED,
+    // Backward-compat: earlier data may have APPROVED/REJECTED
+    APPROVED,
+    REJECTED
 }

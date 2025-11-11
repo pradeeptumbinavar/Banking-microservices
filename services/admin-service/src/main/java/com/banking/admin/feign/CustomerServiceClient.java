@@ -25,5 +25,8 @@ public interface CustomerServiceClient {
     // For notification targeting
     @GetMapping("/{id}")
     com.banking.admin.feign.dto.CustomerResponse getCustomer(@org.springframework.web.bind.annotation.PathVariable("id") Long id);
+
+    @GetMapping("/all")
+    java.util.List<com.banking.admin.feign.dto.CustomerResponse> getAllCustomers();
 }
 

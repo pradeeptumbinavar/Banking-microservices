@@ -105,6 +105,14 @@ const Navbar = () => {
                     <i className="bi bi-speedometer2 me-1"></i>
                     Dashboard
                   </Nav.Link>
+                  {user?.role === 'ADMIN' && (
+                    <>
+                      <Nav.Link as={Link} to="/admin/insights">
+                        <i className="bi bi-graph-up-arrow me-1"></i>
+                        Insights
+                      </Nav.Link>
+                    </>
+                  )}
                   {user?.role !== 'ADMIN' && (
                     <>
                       <Nav.Link as={Link} to="/accounts">

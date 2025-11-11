@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { Container, Card, Tabs, Tab, Row, Col, Form, Button, Table, Spinner, Badge } from 'react-bootstrap';
 import api from '../../services/api';
 import { toast } from 'react-toastify';
-import { KYCStatusOptions, AccountStatusOptions, CreditProductStatusOptions, PaymentStatusOptions } from '../../constants/enums';
+import { KYCStatusOptions, AccountStatusOptions, CreditProductStatusOptions, PaymentStatusOptions, getStatusDetails } from '../../constants/enums';
 
 const Endpoints = {
   // Use Admin aggregator endpoints so all tabs return a common shape { id, type, status, description, service }
@@ -26,7 +26,7 @@ function BulkBar({ options, value, onChange, count, onApply, disabled }) {
   );
 }
 
-function ApprovalsTable({ columns, rows, loading, selectedIds, onToggleRow, onToggleAll, statusGetter }) {
+function ApprovalsTable({ columns, rows, loading, selectedIds, onToggleRow, onToggleAll, statusGetter, statusIconGetter }) {
   const allIds = rows.map(r => r.id);
   const allSelected = allIds.length > 0 && allIds.every(id => selectedIds.includes(id));
   return (
@@ -54,7 +54,12 @@ function ApprovalsTable({ columns, rows, loading, selectedIds, onToggleRow, onTo
                 {columns.map(c => (
                   <td key={c.key}>
                     {c.key === 'status' ? (
-                      <Badge bg={statusGetter(r[c.key])}>{r[c.key]}</Badge>
+                      <Badge bg={statusGetter(r[c.key])}>
+                        {statusIconGetter ? (
+                          <i className={`bi bi-${statusIconGetter(r[c.key])} me-1`} />
+                        ) : null}
+                        {r[c.key]}
+                      </Badge>
                     ) : (
                       r[c.key]
                     )}
@@ -238,15 +243,25 @@ const AdminDashboard = () => {
     }
   };
 
+  const statusIconGetter = (status) => {
+    const typeMap = { KYC: 'kyc', Accounts: 'account', Credits: 'credit', Payments: 'payment' };
+    const typeKey = typeMap[active] || 'account';
+    const details = getStatusDetails(status, typeKey);
+    return details?.icon;
+  };
+
   return (
     <Container className="py-4">
-      <h2 className="mb-4" style={{ color: 'var(--heading-color)' }}>Admin Approvals</h2>
+      <div className="section-heading">
+        <span className="section-heading__icon"><i className="bi bi-ui-checks-grid" /></span>
+        <h2 className="section-heading__title m-0">Admin Approvals</h2>
+      </div>
       <Card className="glass-nav border-0 p-3">
         <Tabs activeKey={active} onSelect={onSelectTab} className="mb-3">
-          <Tab eventKey="KYC" title="KYC" />
-          <Tab eventKey="Accounts" title="Accounts" />
-          <Tab eventKey="Credits" title="Credits" />
-          <Tab eventKey="Payments" title="Payments" />
+          <Tab eventKey="KYC" title={<><i className="bi bi-shield-check me-1" />KYC</>} />
+          <Tab eventKey="Accounts" title={<><i className="bi bi-wallet2 me-1" />Accounts</>} />
+          <Tab eventKey="Credits" title={<><i className="bi bi-credit-card me-1" />Credits</>} />
+          <Tab eventKey="Payments" title={<><i className="bi bi-arrow-left-right me-1" />Payments</>} />
         </Tabs>
 
         <div className="d-flex justify-content-between align-items-center mb-3">
@@ -294,6 +309,7 @@ const AdminDashboard = () => {
           onToggleRow={(id, checked) => setSelectedIds(prev => checked ? [...prev, id] : prev.filter(x => x !== id))}
           onToggleAll={(allIds, checked) => setSelectedIds(checked ? allIds : [])}
           statusGetter={statusVariant}
+          statusIconGetter={statusIconGetter}
           />
         )}
       </Card>

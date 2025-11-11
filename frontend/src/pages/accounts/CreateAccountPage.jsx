@@ -8,7 +8,7 @@ import { useAuth } from '../../hooks/useAuth';
 const CreateAccountPage = () => {
   const [formData, setFormData] = useState({
     accountType: 'SAVINGS',
-    currency: 'USD'
+    currency: 'INR'
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();

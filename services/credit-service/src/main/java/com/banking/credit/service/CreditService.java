@@ -151,20 +151,27 @@ public class CreditService {
     }
     
     private CreditProductResponse toResponse(CreditProduct product) {
+        String productType = product.getProductType() != null ? product.getProductType().name() : null;
+        String status = product.getStatus() != null ? product.getStatus().name() : null;
         return CreditProductResponse.builder()
             .id(product.getId())
             .customerId(product.getCustomerId())
-            .productType(product.getProductType().name())
+            .productType(productType)
             .cardType(product.getCardType() != null ? product.getCardType().name() : null)
             .loanType(product.getLoanType() != null ? product.getLoanType().name() : null)
             .amount(product.getAmount())
             .creditLimit(product.getCreditLimit())
             .interestRate(product.getInterestRate())
             .termMonths(product.getTermMonths())
-            .status(product.getStatus().name())
+            .status(status)
             .createdAt(product.getCreatedAt())
             .updatedAt(product.getUpdatedAt())
             .build();
+    }
+
+    public List<CreditProductResponse> getAllCreditProducts() {
+        List<CreditProduct> products = creditProductRepository.findAll();
+        return products.stream().map(this::toResponse).collect(Collectors.toList());
     }
 }
 

@@ -119,18 +119,25 @@ public class PaymentService {
     }
     
     private PaymentResponse toResponse(Payment payment) {
+        String paymentType = payment.getPaymentType() != null ? payment.getPaymentType().name() : null;
+        String status = payment.getStatus() != null ? payment.getStatus().name() : null;
         return PaymentResponse.builder()
             .id(payment.getId())
             .fromAccountId(payment.getFromAccountId())
             .toAccountId(payment.getToAccountId())
             .amount(payment.getAmount())
             .currency(payment.getCurrency())
-            .paymentType(payment.getPaymentType().name())
-            .status(payment.getStatus().name())
+            .paymentType(paymentType)
+            .status(status)
             .description(payment.getDescription())
             .createdAt(payment.getCreatedAt())
             .updatedAt(payment.getUpdatedAt())
             .build();
+    }
+
+    public List<PaymentResponse> getAllPayments() {
+        List<Payment> payments = paymentRepository.findAll();
+        return payments.stream().map(this::toResponse).collect(Collectors.toList());
     }
 }
 

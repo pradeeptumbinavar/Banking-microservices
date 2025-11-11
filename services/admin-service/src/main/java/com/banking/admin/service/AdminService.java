@@ -186,4 +186,46 @@ public class AdminService {
         log.error("Circuit breaker fallback: {}", e.getMessage());
         return new ArrayList<>();
     }
+
+    // Insights: fetch-all aggregations (no filtering)
+    @io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker(name = "admin-service", fallbackMethod = "fallbackCustomers")
+    public java.util.List<com.banking.admin.feign.dto.CustomerResponse> getAllCustomers() {
+        return customerServiceClient.getAllCustomers();
+    }
+
+    @io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker(name = "admin-service", fallbackMethod = "fallbackAccounts")
+    public java.util.List<com.banking.admin.feign.dto.AccountResponse> getAllAccounts() {
+        return accountServiceClient.getAllAccounts();
+    }
+
+    @io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker(name = "admin-service", fallbackMethod = "fallbackPayments")
+    public java.util.List<com.banking.admin.feign.dto.PaymentResponse> getAllPayments() {
+        return paymentServiceClient.getAllPayments();
+    }
+
+    @io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker(name = "admin-service", fallbackMethod = "fallbackCredits")
+    public java.util.List<com.banking.admin.feign.dto.CreditProductResponse> getAllCredits() {
+        return creditServiceClient.getAllCredits();
+    }
+
+    // Fallbacks for insights fetch-all endpoints
+    private java.util.List<com.banking.admin.feign.dto.CustomerResponse> fallbackCustomers(Exception e) {
+        log.error("Insights fallback (customers): {}", e.getMessage());
+        return new ArrayList<>();
+    }
+
+    private java.util.List<com.banking.admin.feign.dto.AccountResponse> fallbackAccounts(Exception e) {
+        log.error("Insights fallback (accounts): {}", e.getMessage());
+        return new ArrayList<>();
+    }
+
+    private java.util.List<com.banking.admin.feign.dto.PaymentResponse> fallbackPayments(Exception e) {
+        log.error("Insights fallback (payments): {}", e.getMessage());
+        return new ArrayList<>();
+    }
+
+    private java.util.List<com.banking.admin.feign.dto.CreditProductResponse> fallbackCredits(Exception e) {
+        log.error("Insights fallback (credits): {}", e.getMessage());
+        return new ArrayList<>();
+    }
 }

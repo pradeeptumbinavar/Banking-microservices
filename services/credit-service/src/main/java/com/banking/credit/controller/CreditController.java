@@ -72,5 +72,11 @@ public class CreditController {
     public ResponseEntity<List<CreditProductResponse>> getCreditProductsByUserId(@PathVariable("userId") Long userId) {
         return ResponseEntity.ok(creditService.getCreditProductsByUserId(userId));
     }
+
+    @GetMapping("/all")
+    @Operation(summary = "Get all credit products (any status)")
+    public ResponseEntity<List<CreditProductResponse>> getAllCreditProducts() {
+        return ResponseEntity.ok(creditService.getAllCreditProducts());
+    }
 }
 

@@ -124,17 +124,24 @@ public class AccountService {
     }
     
     private AccountResponse toResponse(Account account) {
+        String accountType = account.getAccountType() != null ? account.getAccountType().name() : null;
+        String status = account.getStatus() != null ? account.getStatus().name() : null;
         return AccountResponse.builder()
             .id(account.getId())
             .customerId(account.getCustomerId())
             .accountNumber(account.getAccountNumber())
-            .accountType(account.getAccountType().name())
+            .accountType(accountType)
             .balance(account.getBalance())
             .currency(account.getCurrency())
-            .status(account.getStatus().name())
+            .status(status)
             .createdAt(account.getCreatedAt())
             .updatedAt(account.getUpdatedAt())
             .build();
+    }
+
+    public List<AccountResponse> getAllAccounts() {
+        List<Account> accounts = accountRepository.findAll();
+        return accounts.stream().map(this::toResponse).collect(Collectors.toList());
     }
 }
 

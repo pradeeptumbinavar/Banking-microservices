@@ -66,5 +66,11 @@ public class PaymentController {
     public ResponseEntity<List<PaymentResponse>> getPaymentsByUserId(@PathVariable("userId") Long userId) {
         return ResponseEntity.ok(paymentService.getPaymentsByUserId(userId));
     }
+
+    @GetMapping("/all")
+    @Operation(summary = "Get all payments (any status)")
+    public ResponseEntity<List<PaymentResponse>> getAllPayments() {
+        return ResponseEntity.ok(paymentService.getAllPayments());
+    }
 }
 

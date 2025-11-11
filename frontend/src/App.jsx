@@ -26,6 +26,7 @@ import ProfilePage from './pages/profile/ProfilePage';
 
 // Admin Pages
 import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminInsights from './pages/admin/AdminInsights';
 import UserManagementPage from './pages/admin/UserManagementPage';
 
 // Common Pages
@@ -131,6 +132,12 @@ const App = () => {
         <Route path="/admin" element={
           <RequireRole allowedRoles={['ADMIN']}>
             <AdminDashboard />
+          </RequireRole>
+        } />
+
+        <Route path="/admin/insights" element={
+          <RequireRole allowedRoles={['ADMIN']}>
+            <AdminInsights />
           </RequireRole>
         } />
 

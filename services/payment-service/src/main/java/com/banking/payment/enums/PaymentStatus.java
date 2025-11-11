@@ -4,5 +4,7 @@ public enum PaymentStatus {
     PENDING,
     COMPLETED,
     FAILED,
-    REJECTED
+    REJECTED,
+    // Backward-compat: legacy rows may contain APPROVED
+    APPROVED
 }

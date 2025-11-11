@@ -77,5 +77,11 @@ public class AccountController {
         }
         return ResponseEntity.ok(accountService.getAccountsByUserId(userId));
     }
+
+    @GetMapping("/all")
+    @Operation(summary = "Get all accounts (any status)")
+    public ResponseEntity<List<AccountResponse>> getAllAccounts() {
+        return ResponseEntity.ok(accountService.getAllAccounts());
+    }
 }
 

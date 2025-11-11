@@ -128,6 +128,12 @@ export const API_ENDPOINTS = {
     // Payment Approvals
     PAYMENT_APPROVALS: '/admin/payments/approvals',       // GET
     PAYMENT_BULK: '/admin/payments/approvals/bulk',       // POST
+
+    // Insights - Fetch all entities (Admin)
+    CUSTOMERS_ALL: '/admin/customers/all',
+    ACCOUNTS_ALL: '/admin/accounts/all',
+    PAYMENTS_ALL: '/admin/payments/all',
+    CREDITS_ALL: '/admin/credits/all',
   },
 };
 

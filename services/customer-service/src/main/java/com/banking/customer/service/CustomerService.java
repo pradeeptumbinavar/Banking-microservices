@@ -143,8 +143,14 @@ public class CustomerService {
             .map(c -> new ActiveCustomerSummary(c.getId(), c.getFirstName(), c.getLastName()))
             .collect(Collectors.toList());
     }
+
+    public List<CustomerResponse> getAllCustomers() {
+        List<Customer> customers = customerRepository.findAll();
+        return customers.stream().map(this::toResponse).collect(Collectors.toList());
+    }
     
     private CustomerResponse toResponse(Customer customer) {
+        String kycStatus = customer.getKycStatus() != null ? customer.getKycStatus().name() : null;
         return CustomerResponse.builder()
             .id(customer.getId())
             .userId(customer.getUserId())
@@ -153,7 +159,7 @@ public class CustomerService {
             .email(customer.getEmail())
             .phone(customer.getPhone())
             .address(customer.getAddress())
-            .kycStatus(customer.getKycStatus().name())
+            .kycStatus(kycStatus)
             .createdAt(customer.getCreatedAt())
             .updatedAt(customer.getUpdatedAt())
             .build();

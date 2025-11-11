@@ -25,5 +25,8 @@ public interface AccountServiceClient {
 
     @GetMapping("/{id}")
     com.banking.admin.feign.dto.AccountResponse getAccount(@PathVariable("id") Long id);
+
+    @GetMapping("/all")
+    java.util.List<com.banking.admin.feign.dto.AccountResponse> getAllAccounts();
 }
 

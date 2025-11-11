@@ -25,5 +25,8 @@ public interface PaymentServiceClient {
 
     @GetMapping("/{id}")
     com.banking.admin.feign.dto.PaymentResponse getPayment(@PathVariable("id") Long id);
+
+    @GetMapping("/all")
+    java.util.List<com.banking.admin.feign.dto.PaymentResponse> getAllPayments();
 }
 

@@ -70,5 +70,30 @@ public class AdminController {
     public ResponseEntity<String> bulkApprovePayments(@RequestBody ApprovalRequest request) {
         return ResponseEntity.ok(adminService.bulkApprovePayments(request));
     }
+
+    // Insights - fetch all entities for admin dashboards
+    @GetMapping("/customers/all")
+    @Operation(summary = "Get all customers (any status)")
+    public ResponseEntity<java.util.List<com.banking.admin.feign.dto.CustomerResponse>> getAllCustomers() {
+        return ResponseEntity.ok(adminService.getAllCustomers());
+    }
+
+    @GetMapping("/accounts/all")
+    @Operation(summary = "Get all accounts (any status)")
+    public ResponseEntity<java.util.List<com.banking.admin.feign.dto.AccountResponse>> getAllAccounts() {
+        return ResponseEntity.ok(adminService.getAllAccounts());
+    }
+
+    @GetMapping("/payments/all")
+    @Operation(summary = "Get all payments (any status)")
+    public ResponseEntity<java.util.List<com.banking.admin.feign.dto.PaymentResponse>> getAllPayments() {
+        return ResponseEntity.ok(adminService.getAllPayments());
+    }
+
+    @GetMapping("/credits/all")
+    @Operation(summary = "Get all credit products (any status)")
+    public ResponseEntity<java.util.List<com.banking.admin.feign.dto.CreditProductResponse>> getAllCredits() {
+        return ResponseEntity.ok(adminService.getAllCredits());
+    }
 }
 
